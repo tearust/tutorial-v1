@@ -3,7 +3,6 @@ import Router from 'vue-router'
 
 import Home from './views/Home';
 import LoginPage from './views/LoginPage';
-// import Welcome from './views/Welcome';
 import AccountProfile from './views/AccountProfile';
 
 Vue.use(Router);
@@ -12,11 +11,11 @@ Vue.use(Router);
 let routers = [
   {
     path: '/',
-    redirect: '/home',
+    redirect: '/welcome',
   },
   {
-    path: '/home',
-    name: 'home',
+    path: '/welcome',
+    name: 'welcome',
     component: Home,
   },
   {
