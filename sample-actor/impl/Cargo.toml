@@ -1,0 +1,18 @@
+[package]
+name = "sample-actor"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+sample-actor-codec = { path = "../codec" }
+tea-sdk = { workspace = true, features = ["wasm"] }
+thiserror = { workspace = true }
+serde_json = { workspace = true }
+log = { workspace = true }
+
+[dev-dependencies]
+tea-sdk = { workspace = true, features = ["mock"] }
+tokio = { workspace = true, features = ["full"] }
