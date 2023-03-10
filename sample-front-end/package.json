@@ -8,6 +8,7 @@
   },
   "dependencies": {
     "axios": "0.21.1",
+    "clipboard": "2.0.8",
     "core-js": "3.15.1",
     "element-ui": "2.13.2",
     "ethers": "5.7.0",
@@ -18,7 +19,8 @@
     "tearust_utils": "1.0.3",
     "vue": "2.6.14",
     "vue-router": "3.3.4",
-    "vuex": "3.6.0"
+    "vuex": "3.6.0",
+    "@polkadot/util": "10.1.9"
   },
   "devDependencies": {
     "@open-wc/webpack-import-meta-loader": "0.4.7",

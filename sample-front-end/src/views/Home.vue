@@ -6,22 +6,17 @@
 </div>
 </template>
 <script>
-import {_, axios} from 'tearust_utils';
+import {_} from 'tearust_utils';
+import layer2 from '../layer2';
 export default {
   data(){
     return {};
   },
   methods: {
-    get_env(key) {
-      const x_key = 'VUE_APP_' + _.toUpper(key);
-      return _.get(process.env, x_key, null);
-    },
     async send_request(){
-      const _axios = axios.create({
-        baseURL: this.get_env('LAYER2_URL'),
-      });
+      const _axios = layer2.base.getAxios();
       const rs = await _axios.post('/say-hello', {
-        actor: 'someone.sample',
+        sample: true,
         address: '0x000000000000000000000000000000000000000f'
       });
       alert(JSON.stringify(rs));

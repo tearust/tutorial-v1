@@ -10,6 +10,11 @@
     </section>
     
     <PageFooter />
+
+    <CommonTxModal />
+    <CommonFormModal />
+    <LoginModal />
+    <TransferBalanceModal />
   </div>
 </template>
 
@@ -17,12 +22,20 @@
 import PageHeader from './components/PageHeader';
 import PageFooter from './components/PageFooter';
 
+import CommonTxModal from './views/modals/CommonTxModal';
+import CommonFormModal from './views/modals/CommonFormModal';
+import LoginModal from './views/modals/LoginModal';
+import TransferBalanceModal from './views/modals/TransferBalanceModal';
+
 
 export default {
   components: {
     PageHeader,
     PageFooter,
-
+    CommonTxModal,
+    CommonFormModal,
+    LoginModal,
+    TransferBalanceModal,
   }
 }
 </script>
