@@ -3,22 +3,25 @@
 #![feature(async_fn_in_trait)]
 
 use crate::error::GreetingNameEmpty;
-use error::{HttpActionNotSupported, Result};
-use sample_actor_codec::{AddRequest, AddResponse, GreetingsRequest};
+use error::{Result};
+use sample_actor_codec::{GreetingsRequest};
 use tea_sdk::{
-    actors::adapter::HttpRequest,
     actorx::runtime::{actor, println, Activate, PreInvoke},
     serde::handle::{Handle, Handles},
-    utils::wasm_actor::logging::set_logging,
+    utils::wasm_actor::{
+        action::callback_reply,
+        logging::set_logging,
+    },
     Handle, ResultExt,
 };
+use tea_sdk::utils::client_wasm_actor::types::{map_handler, HttpRequest};
+use tea_sdk::actors::libp2p::Libp2pReply;
 
-#[cfg(not(test))]
 use ::{log::info, tea_sdk::utils::wasm_actor::actors::adapter::register_adapter_http_dispatcher};
+use tea_sdk::utils::client_wasm_actor::types::map_fn_list;
 
 pub mod error;
-#[cfg(test)]
-mod tests;
+mod dfn;
 
 actor!(Actor);
 
@@ -31,19 +34,18 @@ impl Handles<()> for Actor {
         PreInvoke,
         HttpRequest,
         GreetingsRequest,
-        AddRequest
+        Libp2pReply
     ];
 }
 
 impl Handle<(), Activate> for Actor {
     async fn handle(self, _: Activate, _: ()) -> Result<()> {
-        #[cfg(not(test))]
-        {
-            register_adapter_http_dispatcher(vec!["say-hello".to_string()]).await?;
-            info!("activate sample actor successfully");
-        }
+        let list = [&map_fn_list()[..], &crate::dfn::name_list()[..]].concat();
+        register_adapter_http_dispatcher(list.iter().map(|v| v.to_string()).collect()).await?;
+        info!("activate sample actor successfully");
         Ok(())
     }
+
 }
 
 impl Handle<(), PreInvoke> for Actor {
@@ -53,13 +55,17 @@ impl Handle<(), PreInvoke> for Actor {
     }
 }
 
+
 impl Handle<(), HttpRequest> for Actor {
-    async fn handle(self, HttpRequest { action, .. }: HttpRequest, _: ()) -> Result<Vec<u8>> {
-        match action.as_str() {
-            "say-hello" => serde_json::to_vec("Hello world!").err_into(),
-            _ => Err(HttpActionNotSupported(action).into()),
-        }
-    }
+	async fn handle(self, req: HttpRequest, _: ()) -> Result<Vec<u8>> {
+		let from_actor = "sample_actor".to_string();
+		let base_res = map_handler(&req.action, req.clone().payload, from_actor.clone()).await?;
+		let cur_res = crate::dfn::map_handler(&req.action, req.payload, from_actor).await?;
+		if cur_res.is_empty() && !base_res.is_empty() {
+			return Ok(base_res);
+		}
+		Ok(cur_res)
+	}
 }
 
 impl Handle<(), GreetingsRequest> for Actor {
@@ -73,8 +79,9 @@ impl Handle<(), GreetingsRequest> for Actor {
     }
 }
 
-impl Handle<(), AddRequest> for Actor {
-    async fn handle(self, AddRequest(lhs, rhs): AddRequest, _: ()) -> Result<AddResponse> {
-        Ok(AddResponse(lhs + rhs))
-    }
+
+impl Handle<(), Libp2pReply> for Actor {
+	async fn handle(self, Libp2pReply(seq_number, payload): Libp2pReply, _: ()) -> Result<()> {
+		callback_reply(seq_number, payload).await.err_into()
+	}
 }
