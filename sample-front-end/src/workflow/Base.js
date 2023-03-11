@@ -2,7 +2,6 @@ import layer2 from '../layer2';
 import eth from '../eth';
 import utils from '../tea/utils';
 import Log from '../shared/utility/Log';
-import http from '../tea/http';
 import store from '../store';
 import request from '../request';
 
@@ -82,16 +81,7 @@ export default class {
       store.commit('set_chain', {
         current_block: block,
       });
-      if(utils.getEpochEndBlock() - block < 1){
-        utils.mem.set('epoch_closed', true);
-
-        // if(store.state.user && store.state.user.isLogin && store.state.user.address !== utils.consts.SUDO_ACCOUNT){
-        //   _.delay(async ()=>{
-        //     await layer2.user.logout();
-        //   }, 5000);
-        // }
-
-      }
+      
     });
 
   }
@@ -214,48 +204,6 @@ export default class {
     };
   }
 
-  async transferBalance(address, amount, isCoffee=false) {
-    const layer1_account = store.getters.layer1_account;
-    if (!layer1_account.address) {
-      return false;
-    }
-
-    if (!amount || amount === 0) {
-      throw 'Invalid transfer balance.';
-    }
-
-    if(!address){
-      throw 'Invalid receiver\'s address.';
-    }
-
-    if(address === layer1_account.address){
-      throw 'You cannot send to yourself.';
-    }
-
-    const layer1_instance = this.getLayer1Instance();
-    const api = layer1_instance.getApi();
-
-    const total = layer1_instance.asUnit() * amount;
-    const tt = amount > 9000 ? numberToHex(total) : Math.floor(total);
-    console.log(11, tt);
-    let transfer_tx = api.tx.balances.transfer(address, tt);
-    if(isCoffee){
-      transfer_tx = api.tx.genesisExchange.transferUsd(address, tt);
-    }
-    await layer1_instance.sendTx(layer1_account.address, transfer_tx);
-  }
-
-  async getCoupons(address) {
-  
-    return {
-      coupon_investor_A: 0,
-      coupon_investor_B: 0,
-      coupon_investor_C: 0,
-      coupon_team_A: 0,
-      coupon_team_B: 0,
-      coupon_team_C: 0,
-    }
-  }
 
   async refreshCurrentAccount() {
 
@@ -270,8 +218,6 @@ export default class {
     // reset all state
     store.commit('reset_state');
 
-    // const cml_list = await this.getCmlListByUser(layer1_account.address);
-    // const cml_data = await this.getCmlByList(cml_list);
     this._log.i("refresh current layer1_account");
     store.commit('set_account', {
       eth: balance.eth,
@@ -308,11 +254,6 @@ export default class {
 
   to_default_cml(cml){
     cml.version_expired = false;
-    // cml.machine_id = '0x123';
-    // cml.remaining_performance = 0;
-    // cml.status = '';
-    // cml.miner_status = '';
-    // cml.staking_slot = 0;
     return cml;
   }
 

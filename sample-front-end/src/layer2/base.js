@@ -1,6 +1,5 @@
 import {_, axios, moment, uuid} from 'tearust_utils';
 import utils from '../tea/utils';
-import tapp from '../tea/tapp';
 import store from '../store';
 import {ContractMap} from '../eth/consts';
 

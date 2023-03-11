@@ -3,7 +3,6 @@ import App from './App.vue'
 
 import './elementui-style/index.css';
 import ElementUI from 'element-ui';
-// import 'element-ui/lib/theme-chalk/index.css';
 import { Loading } from 'element-ui';
 import locale from 'element-ui/lib/locale/lang/en';
 
@@ -20,7 +19,7 @@ import helper from './views/helper';
 
 import './filter';
 import layer2 from './layer2';
-import {VestingUsers, ContractMap} from './eth/consts';
+import {ContractMap} from './eth/consts';
 
 
 
@@ -156,18 +155,8 @@ new Vue({
     go_wallet(url){
       helper.go_wallet(url);
     },
-    to_user_detail(user_id){
-      this.$root.goPath('/user_detail/'+user_id);
-    },
-    to_entity_detail(entity_id){
-      this.$root.goPath('/entity/'+encodeURIComponent(entity_id));
-    },
-    async open_tapp_link(tapp_row){
-      helper.showTAppLink(this, tapp_row);
-    },
-    inTokenVestingUserList(address){
-      return _.includes(VestingUsers, _.toLower(address));
-    },
+
+    
   },
   render: h => {
     return h(App);

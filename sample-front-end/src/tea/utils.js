@@ -1,5 +1,4 @@
 
-import http from './http';
 import Pubsub from 'pubsub-js';
 import { ethers } from "ethers";
 import * as tearust_utils from 'tearust_utils';
