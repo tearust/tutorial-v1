@@ -20,13 +20,13 @@ const _axios = axios.create({
 
 // set request header 
 _axios.interceptors.request.use((config)=>{
-  if(config.data.sample){
+  // if(config.data.sample){
     config.data.actor = meta.server_actor;
-    delete config.data.sample;
-  }
-  else {
-    config.data.actor = meta.system_actor;
-  }
+  //   delete config.data.sample;
+  // }
+  // else {
+  //   config.data.actor = meta.system_actor;
+  // }
   
   return config;
 });

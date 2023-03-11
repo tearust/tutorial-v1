@@ -8,6 +8,9 @@ import user from './user';
 const F = {
 
   async txn_request(method, param){
+    if(!param.address){
+      throw "Txn must include address.";
+    }
     const _uuid = uuid();
     console.log("prepare for txn: ", method, _uuid);
     
@@ -40,6 +43,7 @@ const F = {
         console.log('query result for '+txn_uuid+'...');
         step_2_rs = await _axios.post('/query_result', {
           uuid: txn_uuid,
+          address: param.address,
         });
 
       }catch(e){
@@ -83,6 +87,7 @@ const F = {
           hash: step_3_hash,
           ts: step_3_ts.toString(),
           uuid: hash_uuid,
+          address: param.address,
         });
     
         base.log('Wait for query txn hash result...');
@@ -92,6 +97,7 @@ const F = {
         console.log('query hash result for '+hash_uuid+'...');
         step_4_rs = await _axios.post('/query_result', {
           uuid: hash_uuid,
+          address: param.address,
         });
 
         if(!step_4_rs.status) throw step_4_rs.error;
@@ -144,6 +150,7 @@ const F = {
         console.log('continue query for '+step_5_uuid+'...');
         step_5_rs = await _axios.post('/query_result', {
           uuid: step_5_uuid,
+          address: param.address,
         });
 
       }catch(e){
@@ -167,6 +174,9 @@ const F = {
   },
 
   async query_request(method, param){
+    if(!param.address){
+      throw "Query must include address.";
+    }
     const _uuid = uuid();
   
     // base.log("Start to first query request...");
@@ -200,6 +210,7 @@ const F = {
       try{
         rs = await _axios.post('/query_result', {
           uuid: _uuid,
+          address: param.address,
         });
   
       }catch(e){
