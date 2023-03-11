@@ -9,7 +9,6 @@ const meta = {
   tapp_id: _.toLower(ContractMap.ERC20),
   server_url: utils.get_env('LAYER2_URL'),
   mode: utils.get_env('mode') || 'app',
-  system_actor: 'com.tea.client-actor',
   server_actor: 'someone.sample',
   
 };
@@ -20,13 +19,7 @@ const _axios = axios.create({
 
 // set request header 
 _axios.interceptors.request.use((config)=>{
-  // if(config.data.sample){
-    config.data.actor = meta.server_actor;
-  //   delete config.data.sample;
-  // }
-  // else {
-  //   config.data.actor = meta.system_actor;
-  // }
+  config.data.actor = meta.server_actor;
   
   return config;
 });
