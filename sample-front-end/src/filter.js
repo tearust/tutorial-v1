@@ -59,10 +59,3 @@ Vue.filter('percent', (value)=>{
 Vue.filter('minerHexToB64', (hex)=>{
   return utils.minerHexToB64(hex);
 });
-
-Vue.filter('erc20', (hex)=>{
-  const USDT_ADDRESS = '0xdac17f958d2ee523a2206206994597c13d831ec7';
-  hex = USDT_ADDRESS;
-  const html = '<a style="overflow:hidden;text-overflow: ellipsis;white-space:nowrap;color:#35A696;" href="https://etherscan.io/token/'+hex+'" target="_blank">'+hex+'</a>';
-  return html;
-});

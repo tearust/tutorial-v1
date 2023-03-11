@@ -1,6 +1,5 @@
 import {_} from 'tearust_utils';
 import utils from '../tea/utils';
-import request from '../request';
 import store from '../store';
 
 import layer2 from '../layer2';
@@ -76,15 +75,6 @@ const F = {
   //   window.open(ss+'/ipfs/'+cid, '_blank');
   // },
 
-  async calculateTEAByToken(token_amount){
-    const amount = utils.layer1.amountToBalance(token_amount)
-    let estimate = await request.layer1_rpc('bonding_estimateTeaRequiredToBuyGivenToken', [
-      null, amount, 100,
-    ]);
-    estimate = utils.layer1.balanceToAmount(estimate);
-
-    return estimate;
-  },
 
   
   openUrl(url){

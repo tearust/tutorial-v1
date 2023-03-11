@@ -117,59 +117,6 @@ const F = {
     }
   },
 
-  async sendOtpForEmail(self, email){
-    try{
-      const opts = {
-        email,
-        tokenId: base.getTappId(),
-      };
-      const rs = await txn.txn_request('send_otp_for_email_login', opts);
-      self.$root.success('Login success.');
-      return rs;
-    }catch(e){
-      self.$root.showError(e);
-    }
-  },
-
-  async loginWithEmail(self, data){
-    try{
-      const rs = await txn.txn_request('login_with_email', {
-        tokenId: base.getTappId(),
-        email: data.email,
-        data: utils.forge.util.encode64(data.msg),
-        otp: data.otp,
-      });
-
-      const address = utils.emailToAddress(data.email);
-      if (rs.auth_key) {
-        const user = {
-          address,
-          isLogin: true,
-          email: data.email,
-          session_key: rs.auth_key,
-          expird_time: Date.now() + 1800 * 1000,
-        };
-
-        utils.cache.put(F.getOfflineId(), data.email);
-        utils.cache.put(F.getUserId(address), user);
-        self.$store.commit('set_account', {
-          ...self.layer1_account,
-          email: data.email,
-          address,
-        });
-
-        await store.dispatch('init_user');
-
-        base.top_log(null);
-
-        self.$root.goPath('/account_profile');
-        return true;
-      }
-
-    }catch(e){
-      self.$root.showError(e);
-    }
-  },
 
   async logout(address = null) {
     const _axios = base.getAxios();
@@ -183,7 +130,6 @@ const F = {
     }
     await utils.sleep(500);
     location.reload(true);
-    // store.dispatch('init_user');
   },
 
   async showLoginModal(self, succ_cb = null) {
@@ -309,32 +255,7 @@ const F = {
     });
   },
 
-  async send_email_for_transfer_tea(from_address, email, amount){
-    const url = location.protocol+'//'+location.host+utils.get_env('email_url');
-    const content = `Hello,<br />
-    The following email address has sent you <b>${amount}</b> TEA tokens so you can join the TEA Project:
-    <br />
-    ${from_address}
-    <br />
-    <br />
-    You may claim them by visiting the following link and setting up your TEA Project email wallet.
-    <br />
-    <a href="${url}">Click here</a>
-    <br />
-    <br />
-    You'll need to generate a verification code from the email wallet in order to login which will be sent to your email address.
-    <br />
-    <br />
-    The TEA Project brings decentralized computing to Ethereum through an independent compute layer. By claiming these TEA tokens, you understand that they're testnet TEA tokens and are used as proxies for purposes of competing for mainnet TEA vouchers. Please visit our <a href="https://t.me/teaprojectorg">Telegram</a> or <a href="https://discord.com/invite/nvtaneQgGb">Discord</a> if you have any questions.`;
-    const opts = {
-      to: email,
-      subjectB64: utils.forge.util.encode64('Someone Sent You '+amount+' TEA'),
-      contentB64: utils.forge.util.encode64(content),
-    };
-    const _axios = base.getAxios();
-    const rs = await _axios.post('/local_request_for_send_email', opts);
-    console.log(rs);
-  },
+  
 
   async transferTea(self, param = {}, succ_cb) {
     const session_key = F.checkLogin(self);

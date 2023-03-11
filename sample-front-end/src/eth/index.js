@@ -1,7 +1,7 @@
-import { ethers, BigNumber } from "ethers";
+import { ethers } from "ethers";
 import utils from '../tea/utils';
 import { ChainMap, ContractMap } from "./consts";
-import {_, moment} from 'tearust_utils';
+import {_} from 'tearust_utils';
 import store from '../store';
 import help from './help';
 
@@ -17,11 +17,6 @@ class Instance {
 
     this.provider = new ethers.providers.Web3Provider(window.ethereum);
 
-    this.maintainer_contract = new ethers.Contract(
-      ContractMap.MAINTAINER, 
-      require('./abi/Maintainer.sol/Maintainer.json').abi, 
-      this.provider.getSigner(),
-    );
 
     this.lock_contract = new ethers.Contract(
       ContractMap.LOCK,
@@ -32,23 +27,6 @@ class Instance {
     this.tea_contract = new ethers.Contract(
       ContractMap.ERC20,
       require('./abi/ERC20.sol/ERC20Token.json').abi,
-      this.provider.getSigner(),
-    );
-    this.cml_contract = new ethers.Contract(
-      ContractMap.ERC721,
-      require('./abi/ERC721.sol/ERC721.json').abi,
-      this.provider.getSigner(),
-    );
-
-    this.coffee_contract = new ethers.Contract(
-      ContractMap.COFFEE,
-      require('./abi/Coffee.sol/COFFEE.json').abi,
-      this.provider.getSigner(),
-    );
-
-    this.token_vesting_contract = new ethers.Contract(
-      ContractMap.TOKENVESTING,
-      require('./abi/TokenVesting.sol/TokenVesting.json').abi,
       this.provider.getSigner(),
     );
 
@@ -118,12 +96,7 @@ class Instance {
     const balance = U.formatUnits(n, 'ether');
     return balance
   }
-  async getCoffeeBalance(){
-    // const n = await this.coffee_contract.balanceOf(this.signer.getAddress());
-    // const balance = U.formatUnits(n, 'ether');
-    // return balance
-    return 0;
-  }
+
 
   async getChain(){
     const cid = await this.signer.getChainId();
@@ -191,7 +164,6 @@ class Instance {
   async signMessage(message){
     await this.connect();
     const msg1 = (U.toUtf8Bytes(message));
-    // const signature = await this.signer._legacySignMessage(U.arrayify(msg1));
     const signature = await this.signer.signMessage(msg1);
     const pk = U.recoverPublicKey(U.hashMessage(msg1), signature);
     const sig = signature
@@ -199,13 +171,6 @@ class Instance {
     return [sig, pk, U.toUtf8Bytes(message), message];
   }
 
-  async getMaintainerAddressList(){
-    // return await this.maintainer_contract.listValidators();
-    return await this.provider.call({
-      to: '0x368e02679706fbC77ff1173aa1a87AED35B22507',
-      data: '0x3b3b57debf074faa138b72c65adbdcfb329847e4f2c04bde7f7dd7fcad5a52d2f395a558'
-    }, 'latest');
-  }
 
   async queryCurrentBlock(){
     const rs = await this.provider.getBlock();
@@ -228,71 +193,6 @@ class Instance {
     return this._init;
   }
 
-  async getMyCmlList(){
-    const total = (await this.cml_contract.totalSupply()).toString();
-    const list = [];
-    const me = await this.signer.getAddress();
-    for(let i=0; i<total; i++){
-      const owner = await this.cml_contract.ownerOf(i);
-      if(owner === me){
-        list.push({
-          id: i,
-          owner,
-          uri: await this.cml_contract.tokenURI(i)
-        })
-      }
-      
-    }
-    return list;
-  }
-
-  async scheduleListForVesting(address){
-    address = address || this.signer.getAddress();
-    const rs = await this.token_vesting_contract.getVestingSchedulesCountByBeneficiary(address);
-    const list = []
-
-    const day = 3600*24;
-    for(let i=0; i<rs.toNumber(); i++){
-      const sid = await this.token_vesting_contract.computeVestingScheduleIdForAddressAndIndex(address, i);
-
-      const xxx = await this.token_vesting_contract.computeReleasableAmount(sid);
-      const details = await this.token_vesting_contract.getVestingSchedule(sid);
-
-      const dur = details.duration.toNumber();
-      const per = details.slicePeriodSeconds.toNumber();
-      
-      const item = {
-        index: i,
-        schedule_id: sid,
-        amount: utils.layer1.balanceToAmount(xxx.toString()),
-        details,
-        info: {
-          total: utils.layer1.balanceToAmount(details.amountTotal.toString()),
-          released: utils.layer1.balanceToAmount(details.released.toString()),
-          available: utils.layer1.balanceToAmount(details.amountTotal.sub(details.released).sub(xxx).toString()),
-          start: moment.utc(details.start.toNumber()*1000).format('MMM Do, YYYY'),
-          duration: dur < day ? '< 1d' : (Math.floor(dur/day)+'d'),
-          cliff: moment.utc(details.cliff.toNumber()*1000).format('MMM Do, YYYY'),
-          period: per < day ? '< 1d' : (Math.floor(per/day)+'d'),
-        },
-      };
-
-      list.push(item);
-    }
-    console.log('token_vesting list =>', list);
-    return list;
-  }
-  async releaseTeaForVesting(schedule_id, amount){
-    await this.token_vesting_contract.release(schedule_id, amount);
-    return true;
-  }
-
-  async test(){
-    // console.log(this.maintainer_contract)
-    const list = await this.maintainer_contract.listValidators();
-    console.log(1, list);
-    return list;
-  }
 }
 
 const Empty_Instance = class {

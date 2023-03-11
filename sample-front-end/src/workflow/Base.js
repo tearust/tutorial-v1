@@ -3,7 +3,6 @@ import eth from '../eth';
 import utils from '../tea/utils';
 import Log from '../shared/utility/Log';
 import store from '../store';
-import request from '../request';
 
 import { _, forge, moment } from 'tearust_utils';
 import { hexToString, numberToHex } from '@polkadot/util';
@@ -154,46 +153,11 @@ export default class {
     utils.publish('tea-select-layer1-modal', true);
   }
 
-  async getAllDebtByAddress(address){
-    const cml_list = await request.layer1_rpc('cml_userCreditList', [
-      address
-    ]);
-
-    const layer1_instance = this.getLayer1Instance();
-
-    let total = 0;
-    const debt_map = {};
-
-    await Promise.all(_.map(cml_list, async (arr)=>{
-      const cml_id = arr[0];
-      let debt = parseInt(arr[1], 10);
-      // let debt = await api.query.cml.genesisMinerCreditStore(address, cml_id);
-      // debt = debt.toJSON();
-      if (debt) {
-        total += debt;
-      }
-      _.set(debt_map, cml_id, (debt / layer1_instance.asUnit()))
-      return null;
-    }));
-
-    total = total / layer1_instance.asUnit();
-
-    
-    return {
-      total,
-      details: debt_map
-    };
-
-  }
-
-  async getAllPawnByAddress(address){
-    return null;
-  }
+  
 
   async getAllBalance(address) {
     // const eth = await this.layer1.getEthBalance();
     const tea = await this.layer1.getTeaBalance();
-    // const coffee = await this.layer1.getCoffeeBalance();
     return {
       eth: 0,  //Math.floor(eth * 10000) / 10000,
       free: Math.floor(tea * 10000) / 10000,
@@ -238,23 +202,6 @@ export default class {
 
     
     await store.dispatch('init_user');
-  }
-
-  async getCmlListByUser(address) {
-    return await this.layer1.getMyCmlList();
-  }
-
-  async getCmlByList(cml_list) {
-    return _.map(cml_list, (item)=>{
-      item.data = utils.parseJSON(item.uri);
-      return item;
-    });
-
-  }
-
-  to_default_cml(cml){
-    cml.version_expired = false;
-    return cml;
   }
 
 

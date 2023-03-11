@@ -132,12 +132,6 @@ const store = new Vuex.Store({
       state.bbs = bbs;
     },
 
-    set_miner_mode(state, mode=false){
-      if(!state.user){
-        mode = false;
-      }
-      state.miner_mode = mode;
-    },
 
   },
 
