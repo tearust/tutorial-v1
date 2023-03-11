@@ -60,19 +60,11 @@ const F = {
     if(chain.name === 'Offline'){
       throw('You did not install metamask wallet, please login with your email address.');
     }
-    if(chain.name !== 'Goerli'){
-      throw('Current epoch only accept Goerli network. <br> please visit <a href="https://www.youtube.com/watch?v=nsAuqfAQCag" target="_blank">this link<a> to config.');
-    }
 
-    const epoch_closed = utils.mem.get('epoch_closed');
-    if (epoch_closed && !self.$root.is_sudo(address)) {
-      throw 'Current epoch finished, can\'t login.';
-    }
 
     // thanks for https://github.com/polkadot-js/extension/issues/827
     const data = permission_str;
     console.log('permission_str => ' + permission_str);
-
 
     try {
 
@@ -80,7 +72,6 @@ const F = {
       let [sig, pk, msg_bytes, msg] = await layer1_instance.signMessage(data);
 
 
-      // sig = utils.uint8array_to_base64(hexToU8a(sig));
       sig = sig.replace(/^0x/, '');
       let rs = await txn.txn_request('login', {
         tappIdB64: base.getTappId(),
@@ -93,7 +84,6 @@ const F = {
         tappIdB64: base.getTappId(),
         address,
       });
-      console.log(333, rs);
 
       if (rs.auth_key) {
         const user = {
@@ -113,6 +103,7 @@ const F = {
       }
 
     } catch (e) {
+      // TODO handle error.
       throw e;
     }
   },
@@ -122,9 +113,6 @@ const F = {
     const _axios = base.getAxios();
     address = address || store.getters.layer1_account.address;
     if (address) {
-      // await _axios.post('/logout', {
-      //   address,
-      // });
       utils.cache.remove(F.getUserId(address));
       utils.cache.remove(F.getOfflineId());
     }
