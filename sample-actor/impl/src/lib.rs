@@ -20,8 +20,15 @@ use tea_sdk::actors::libp2p::Libp2pReply;
 use ::{log::info, tea_sdk::utils::wasm_actor::actors::adapter::register_adapter_http_dispatcher};
 use tea_sdk::utils::client_wasm_actor::types::map_fn_list;
 
+#[macro_use]
+extern crate serde_derive;
+#[macro_use]
+extern crate log;
+
 pub mod error;
+mod types;
 mod dfn;
+mod api;
 
 actor!(Actor);
 
