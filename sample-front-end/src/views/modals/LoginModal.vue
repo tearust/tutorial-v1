@@ -85,7 +85,7 @@ export default {
     async confirm(){
       const cb = utils.mem.get('login');
       if(cb){
-        await cb('sig', this.close);
+        await cb('read,move', this.close);
       }
     },
     async openHandler(){

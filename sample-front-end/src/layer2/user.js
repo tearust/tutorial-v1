@@ -243,7 +243,33 @@ const F = {
     });
   },
 
-  
+  async faucet(self, param = {}, succ_cb) {
+    const session_key = F.checkLogin(self);
+    try{
+      await self.$confirm('Are you sure to facuet your address 1000 TEA?', {
+        title: 'Faucet TEA',
+        dangerouslyUseHTMLString: true,
+      });
+    }catch(e){
+      return;
+    }
+
+    const opts = {
+      address: self.layer1_account.address,
+      tappIdB64: base.getTappId(),
+      authB64: session_key,
+    };
+    try {
+      await txn.txn_request('faucet', opts);
+
+      self.$root.success();
+      await succ_cb();
+    } catch (e) {
+      self.$root.showError(e);
+    }
+    self.$root.loading(false);
+
+  },
 
   async transferTea(self, param = {}, succ_cb) {
     const session_key = F.checkLogin(self);

@@ -57,7 +57,16 @@
         </div>
 
         
+        <div class="x-bottom">
+          
+          <el-button
+            type="primary"
+            @click="faucet()"
+          >
+            Faucet TEA
+          </el-button>
 
+        </div>
         
       </div>
     </div>
@@ -140,7 +149,11 @@ export default {
       utils.publish("refresh-current-account__account");
     },
     
-    
+    async faucet(){
+      await layer2.user.faucet(this, {}, async ()=>{
+        await this.refreshAccount();
+      });
+    }
     
   },
 };

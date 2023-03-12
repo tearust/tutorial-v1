@@ -15,11 +15,16 @@ export default {
   methods: {
     async send_request(){
       const _axios = layer2.base.getAxios();
-      const rs = await _axios.post('/say-hello', {
-        sample: true,
-        address: '0x000000000000000000000000000000000000000f'
-      });
-      alert(JSON.stringify(rs));
+      try{
+        const rs = await _axios.post('/say-hello', {
+          sample: true,
+          address: '0x000000000000000000000000000000000000000f'
+        });
+        alert(JSON.stringify(rs));
+      }catch(e){
+        alert(e.toString());
+      }
+      
     }
   }
 };
