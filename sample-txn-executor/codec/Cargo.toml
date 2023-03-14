@@ -1,0 +1,10 @@
+[package]
+name = "sample-txn-executor-codec"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+tea-sdk = { workspace = true }
+serde = { workspace = true }
+strum = { workspace = true }
+strum_macros = { workspace = true }

@@ -1,0 +1,15 @@
+actor_id: sample_txn_executor
+owner_id: someone
+token_id: 0000000000000000000000000000000000000000
+access:
+  - tea:adapter
+  - tea:statereceiver
+  - tea:tokenstate
+  - tea:replica
+  - tea:crypto
+  - tea:nitro
+  - tea:env
+  - tea:keyvalue
+  - com.tea.keyvalue-actor.manager
+  - com.tea.tappstore-actor
+  - com.tea.ra-actor
