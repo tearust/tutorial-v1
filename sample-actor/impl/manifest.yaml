@@ -3,3 +3,14 @@ owner_id: someone
 token_id: 0000000000000000000000000000000000000000
 access:
   - tea:adapter
+  - tea:http
+  - tea:libp2p
+  - tea:nitro
+  - tea:keyvalue
+  - tea:replica
+  - tea:env
+  - com.tea.keyvalue-actor.manager
+  - com.tea.replica-service-actor
+  - com.tea.tappstore-actor
+  - tea:crypto
+  - tea:orbitdb

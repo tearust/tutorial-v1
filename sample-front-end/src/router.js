@@ -2,6 +2,8 @@ import Vue from 'vue'
 import Router from 'vue-router'
 
 import Home from './views/Home';
+import LoginPage from './views/LoginPage';
+import AccountProfile from './views/AccountProfile';
 
 Vue.use(Router);
 
@@ -9,12 +11,25 @@ Vue.use(Router);
 let routers = [
   {
     path: '/',
-    redirect: '/home',
+    redirect: '/welcome',
   },
   {
-    path: '/home',
-    name: 'home',
+    path: '/welcome',
+    name: 'welcome',
     component: Home,
+  },
+  {
+    path: '/login_page',
+    name: 'login_page',
+    component: LoginPage,
+  },
+  {
+    path: '/account_profile',
+    name: 'account_profile',
+    component: AccountProfile,
+    meta: {
+      needLogin: true,
+    }
   },
   
   
