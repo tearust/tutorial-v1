@@ -9,7 +9,7 @@ use log::info;
 use prost::Message;
 use sample_txn_executor_codec::txn::Txns;
 use tea_sdk::{
-    actor_txns::{context::TokenContext, Tsid},
+    actor_txns::{context::TokenContext, Tsid, TxnSerial},
     actors::tokenstate::{SqlBeginTransactionRequest, NAME},
     actorx::{runtime::call, RegId},
     serialize,
@@ -19,12 +19,12 @@ use tea_sdk::{
 };
 
 pub(crate) async fn txn_exec(tsid: Tsid, txn: &Txns) -> Result<()> {
-    info!("begin of process transaction {txn}");
+    info!("begin of process transaction for sample => {txn}");
 
     let base: Tsid = query_state_tsid().await?;
     let ctx = serialize(&TokenContext::new_slim(tsid, base, my_token_id()))?;
     let commit_ctx = match txn {
-        Txns::Init { auth_b64 } => {
+        Txns::Init { } => {
             // TODO: check account is tapp owner later
             sql_init(tsid).await?;
             CommitContext::new(
@@ -32,12 +32,13 @@ pub(crate) async fn txn_exec(tsid: Tsid, txn: &Txns) -> Result<()> {
                 None,
                 None,
                 None,
-                decode_auth_key(auth_b64)?,
+                // decode_auth_key(auth_b64)?,
+                10001_u128,
                 txn.to_string(),
             )
         }
         Txns::CreateTask { task, auth_b64 } => {
-            check_account(auth_b64, task.creator).await?;
+            // check_account(auth_b64, task.creator).await?;
             create_task(tsid, task).await?;
             CommitContext::new(
                 ctx,
@@ -50,7 +51,7 @@ pub(crate) async fn txn_exec(tsid: Tsid, txn: &Txns) -> Result<()> {
         }
         Txns::DeleteTask { subject, auth_b64 } => {
             let task = task_by_subject(subject).await?;
-            check_account(auth_b64, task.creator).await?;
+            // check_account(auth_b64, task.creator).await?;
             delete_task(tsid, subject).await?;
             CommitContext::new(
                 ctx,
@@ -67,7 +68,7 @@ pub(crate) async fn txn_exec(tsid: Tsid, txn: &Txns) -> Result<()> {
             auth_b64,
         } => {
             let task = task_by_subject(subject).await?;
-            check_account(auth_b64, task.creator).await?;
+            // check_account(auth_b64, task.creator).await?;
             verify_task(tsid, subject, *failed).await?;
             CommitContext::new(
                 ctx,
@@ -87,7 +88,7 @@ pub(crate) async fn txn_exec(tsid: Tsid, txn: &Txns) -> Result<()> {
             if let Some(worker) = task.worker {
                 return Err(TxnErrors::TaskInprogress(task.subject, worker).into());
             }
-            check_account(auth_b64, *worker).await?;
+            // check_account(auth_b64, *worker).await?;
             take_task(tsid, subject, *worker).await?;
             CommitContext::new(
                 ctx,
@@ -100,7 +101,7 @@ pub(crate) async fn txn_exec(tsid: Tsid, txn: &Txns) -> Result<()> {
         }
         Txns::CompleteTask { subject, auth_b64 } => {
             let task = task_by_subject(subject).await?;
-            check_account(auth_b64, task.worker.ok_or_err("task worker")?).await?;
+            // check_account(auth_b64, task.worker.ok_or_err("task worker")?).await?;
             complete_task(tsid, subject).await?;
             CommitContext::new(
                 ctx,
@@ -132,4 +133,25 @@ async fn new_gluedb_context() -> Result<Option<tokenstate::GluedbTransactionCont
     .await?;
     let res = tokenstate::BeginTransactionResponse::decode(buf.0.as_slice())?;
     Ok(res.context)
+}
+
+pub async fn send_local_tx(
+	txn: Txns,
+) -> Result<()> {
+	let txn_bytes: Vec<u8> = serialize(&txn)?;
+	let txn_name = txn.to_string();
+
+	let tsid = tea_sdk::utils::wasm_actor::actors::replica::send_transaction_locally_ex(
+		&TxnSerial::new(
+			"someone.sample_txn_executor".as_bytes().to_vec(),
+			txn_bytes,
+			tea_sdk::utils::wasm_actor::actors::enclave::random_u64().await?,
+			u64::MAX,
+		),
+		None,
+		true,
+	)
+	.await?;
+	info!("send sample-txn-exectuor {} transaction result: {:?}", txn_name, tsid);
+	Ok(())
 }

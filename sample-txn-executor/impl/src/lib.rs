@@ -45,7 +45,11 @@ impl Handles<()> for Actor {
 impl Handle<(), Activate> for Actor {
     async fn handle(self, _: Activate, _: ()) -> Result<()> {
         register_adapter_http_dispatcher(vec!["query-tasks".to_string()]).await?;
+
+        txn::send_local_tx(Txns::Init{}).await?;
+
         info!("activate sample txn executor actor successfully");
+
         Ok(())
     }
 }
