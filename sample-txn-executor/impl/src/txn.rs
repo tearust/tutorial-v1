@@ -38,7 +38,7 @@ pub(crate) async fn txn_exec(tsid: Tsid, txn: &Txns) -> Result<()> {
             )
         }
         Txns::CreateTask { task, auth_b64 } => {
-            // check_account(auth_b64, task.creator).await?;
+            check_account(auth_b64, task.creator).await?;
             let glue_ctx = new_gluedb_context().await?;
             create_task(tsid, task).await?;
             CommitContext::new(
@@ -52,7 +52,7 @@ pub(crate) async fn txn_exec(tsid: Tsid, txn: &Txns) -> Result<()> {
         }
         Txns::DeleteTask { subject, auth_b64 } => {
             let task = task_by_subject(subject).await?;
-            // check_account(auth_b64, task.creator).await?;
+            check_account(auth_b64, task.creator).await?;
             let glue_ctx = new_gluedb_context().await?;
             delete_task(tsid, subject).await?;
             CommitContext::new(
@@ -70,7 +70,7 @@ pub(crate) async fn txn_exec(tsid: Tsid, txn: &Txns) -> Result<()> {
             auth_b64,
         } => {
             let task = task_by_subject(subject).await?;
-            // check_account(auth_b64, task.creator).await?;
+            check_account(auth_b64, task.creator).await?;
             let glue_ctx = new_gluedb_context().await?;
             verify_task(tsid, subject, *failed).await?;
             CommitContext::new(
@@ -91,7 +91,7 @@ pub(crate) async fn txn_exec(tsid: Tsid, txn: &Txns) -> Result<()> {
             if let Some(worker) = task.worker {
                 return Err(TxnErrors::TaskInprogress(task.subject, worker).into());
             }
-            // check_account(auth_b64, *worker).await?;
+            check_account(auth_b64, *worker).await?;
             let glue_ctx = new_gluedb_context().await?;
             take_task(tsid, subject, *worker).await?;
             CommitContext::new(
@@ -105,7 +105,7 @@ pub(crate) async fn txn_exec(tsid: Tsid, txn: &Txns) -> Result<()> {
         }
         Txns::CompleteTask { subject, auth_b64 } => {
             let task = task_by_subject(subject).await?;
-            // check_account(auth_b64, task.worker.ok_or_err("task worker")?).await?;
+            check_account(auth_b64, task.worker.ok_or_err("task worker")?).await?;
             let glue_ctx = new_gluedb_context().await?;
             complete_task(tsid, subject).await?;
             CommitContext::new(
