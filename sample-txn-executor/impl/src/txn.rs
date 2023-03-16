@@ -10,7 +10,7 @@ use prost::Message;
 use sample_txn_executor_codec::txn::Txns;
 use tea_sdk::{
     actor_txns::{context::TokenContext, Tsid, TxnSerial},
-    actors::tokenstate::{SqlBeginTransactionRequest, NAME},
+    actors::{tokenstate::{SqlBeginTransactionRequest, NAME}, tappstore::txns::TappstoreTxn, tappstore::NAME as TAPPSTORE_NAME},
     actorx::{runtime::call, RegId},
     serialize,
     utils::wasm_actor::actors::statemachine::{query_state_tsid, CommitContext, CommitContextList},
@@ -140,11 +140,9 @@ async fn new_gluedb_context() -> Result<Option<tokenstate::GluedbTransactionCont
     Ok(res.context)
 }
 
-pub async fn send_local_tx(txn: Txns) -> Result<()> {
-    let txn_bytes: Vec<u8> = serialize(&txn)?;
-    let txn_name = txn.to_string();
-
-    let tsid = tea_sdk::utils::wasm_actor::actors::replica::send_transaction_locally_ex(
+pub async fn init_app_db() -> Result<()> {
+    let txn_bytes = tea_sdk::serialize(&Txns::Init{})?;
+    tea_sdk::utils::wasm_actor::actors::replica::send_transaction_locally_ex(
         &TxnSerial::new(
             "someone.sample_txn_executor".as_bytes().to_vec(),
             txn_bytes,
@@ -155,9 +153,23 @@ pub async fn send_local_tx(txn: Txns) -> Result<()> {
         true,
     )
     .await?;
-    info!(
-        "send sample-txn-exectuor {} transaction result: {:?}",
-        txn_name, tsid
-    );
+    Ok(())
+}
+
+pub async fn init_app_token() -> Result<()> {
+    let token_id = my_token_id();
+    let txn = TappstoreTxn::GenAesKey { token_id };
+    let txn_bytes = tea_sdk::serialize(&txn)?;
+    tea_sdk::utils::wasm_actor::actors::replica::send_transaction_locally_ex(
+        &TxnSerial::new(
+            TAPPSTORE_NAME.to_vec(),
+            txn_bytes,
+            tea_sdk::utils::wasm_actor::actors::enclave::random_u64().await?,
+            u64::MAX,
+        ),
+        None,
+        true,
+    )
+    .await?;
     Ok(())
 }
