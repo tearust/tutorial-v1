@@ -16,3 +16,6 @@ then
 fi
 
 tas ../target/wasm32-unknown-unknown/release/sample_actor.wasm
+echo "copy to dev-runner"
+cd ..
+cp -r target/wasm32-unknown-unknown/release/sample_actor.wasm ../../dev-runner/local/b-node/
