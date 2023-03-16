@@ -5,15 +5,17 @@
 use error::{HttpActionNotSupported, Result};
 use log::{error, info};
 use sample_txn_executor_codec::{
-    txn::{Task, Txns},
+    txn::{Status, Task, Txns},
     *,
 };
 use sql::query_all_tasks;
 use tea_sdk::{
+    actor_txns::TxnSerial,
     actors::{adapter::HttpRequest, replica::ExecTxnCast, state_receiver::ActorTxnCheckMessage},
     actorx::runtime::{actor, Activate, PreInvoke},
     deserialize,
     serde::handle::{Handle, Handles},
+    serialize,
     utils::wasm_actor::{
         action::process_txn_error, actors::adapter::register_adapter_http_dispatcher,
         logging::set_logging,
@@ -21,6 +23,7 @@ use tea_sdk::{
     Handle, ResultExt,
 };
 
+mod account;
 pub mod error;
 mod sql;
 mod txn;
@@ -44,8 +47,23 @@ impl Handles<()> for Actor {
 
 impl Handle<(), Activate> for Actor {
     async fn handle(self, _: Activate, _: ()) -> Result<()> {
-        register_adapter_http_dispatcher(vec!["query-tasks".to_string()]).await?;
         info!("activate sample txn executor actor successfully");
+        register_adapter_http_dispatcher(
+            vec![
+                "query-tasks",
+                "init",
+                "create-task",
+                "delete-task",
+                "verify-success",
+                "verify-failed",
+                "take-task",
+                "complete-task",
+            ]
+            .iter()
+            .map(|v| v.to_string())
+            .collect(),
+        )
+        .await?;
         Ok(())
     }
 }
@@ -65,9 +83,93 @@ impl Handle<(), HttpRequest> for Actor {
                 let tasks = query_tasks_by_filter(query).await?;
                 serde_json::to_vec(&tasks).err_into()
             }
+            "init" => {
+                send_tx(Txns::Init {
+                    auth_b64: Default::default(),
+                })
+                .await?;
+                serde_json::to_vec::<[u8; 0]>(&[]).err_into()
+            }
+            "create-task" => {
+                send_tx(Txns::CreateTask {
+                    task: Task {
+                        creator: "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266".parse()?,
+                        subject: "test1".to_string(),
+                        price: Default::default(),
+                        required_deposit: Default::default(),
+                        status: Status::New,
+                        worker: None,
+                    },
+                    auth_b64: Default::default(),
+                })
+                .await?;
+                serde_json::to_vec::<[u8; 0]>(&[]).err_into()
+            }
+            "delete-task" => {
+                send_tx(Txns::DeleteTask {
+                    subject: "test1".to_string(),
+                    auth_b64: Default::default(),
+                })
+                .await?;
+                serde_json::to_vec::<[u8; 0]>(&[]).err_into()
+            }
+            "verify-success" => {
+                send_tx(Txns::VerifyTask {
+                    subject: "test1".to_string(),
+                    auth_b64: Default::default(),
+                    failed: false,
+                })
+                .await?;
+                serde_json::to_vec::<[u8; 0]>(&[]).err_into()
+            }
+            "verify-failed" => {
+                send_tx(Txns::VerifyTask {
+                    subject: "test1".to_string(),
+                    auth_b64: Default::default(),
+                    failed: true,
+                })
+                .await?;
+                serde_json::to_vec::<[u8; 0]>(&[]).err_into()
+            }
+            "take-task" => {
+                send_tx(Txns::TakeTask {
+                    subject: "test1".to_string(),
+                    auth_b64: Default::default(),
+                    worker: "0x05e59d6f7d572ffd9c1038d6325a95c2ece4619e".parse()?,
+                })
+                .await?;
+                serde_json::to_vec::<[u8; 0]>(&[]).err_into()
+            }
+            "complete-task" => {
+                send_tx(Txns::CompleteTask {
+                    subject: "test1".to_string(),
+                    auth_b64: Default::default(),
+                })
+                .await?;
+                serde_json::to_vec::<[u8; 0]>(&[]).err_into()
+            }
             _ => Err(HttpActionNotSupported(action).into()),
         }
     }
+}
+
+async fn send_tx(txn: Txns) -> Result<()> {
+    let txn_bytes: Vec<u8> = serialize(&txn)?;
+    let txn_name = txn.to_string();
+
+    let tsid = tea_sdk::utils::wasm_actor::actors::replica::send_transaction_locally_ex(
+        &TxnSerial::new(
+            b"someone.sample_txn_executor".to_vec(),
+            txn_bytes,
+            0, // set 0 nonce value to avoid redundant
+            100,
+        ),
+        None,
+        true,
+    )
+    .await?;
+    info!("send {} transaction result: {:?}", txn_name, tsid);
+    Ok(())
 }
 
 impl Handle<(), TaskQueryRequest> for Actor {

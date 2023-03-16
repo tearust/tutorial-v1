@@ -6,7 +6,7 @@ use tea_sdk::{
     actors::tokenstate::{ExecGlueCmdRequest, InitGlueSqlRequest, NAME},
     actorx::{runtime::call, RegId},
     serialize,
-    tapp::Account,
+    tapp::{Account, Balance},
     utils::wasm_actor::{
         actors::tokenstate::{
             query_first_row, query_select_rows, sql_query_first, sql_value_to_option_string,
@@ -34,6 +34,22 @@ pub(crate) async fn task_by_subject(subject: &str) -> Result<Task> {
     parse_task(r)
 }
 
+pub(crate) async fn sum_task_deposit(subject: &str) -> Result<Balance> {
+    let payload = sql_query_first(
+        my_token_id(),
+        format!("SELECT price FROM TaskExecution where subject='{subject}';"),
+    )
+    .await?;
+    let rows = query_select_rows(&payload)?;
+    let mut sum = Balance::zero();
+    for row in rows {
+        let price: Balance =
+            sql_value_to_string(row.get_value_by_index(0).ok_or_err("price")?)?.parse()?;
+        sum += sum.checked_add(price).ok_or_err("add overflow")?;
+    }
+    Ok(sum)
+}
+
 pub(crate) async fn create_task(tsid: Tsid, task: &Task) -> Result<()> {
     exec_sql(
         tsid,
@@ -52,7 +68,12 @@ pub(crate) async fn create_task(tsid: Tsid, task: &Task) -> Result<()> {
 pub(crate) async fn delete_task(tsid: Tsid, subject: &str) -> Result<()> {
     exec_sql(
         tsid,
-        format!("DELETE FROM Tasks WHERE subject = '{subject}';"),
+        format!(
+            r#"
+            DELETE FROM Tasks WHERE subject = '{subject}';
+            DELETE FROM TaskExecution WHERE subject = '{subject}';
+        "#
+        ),
     )
     .await
 }
@@ -72,11 +93,19 @@ pub(crate) async fn verify_task(tsid: Tsid, subject: &str, failed: bool) -> Resu
     exec_sql(tsid, sql).await
 }
 
-pub(crate) async fn take_task(tsid: Tsid, subject: &str, worker: Account) -> Result<()> {
+pub(crate) async fn take_task(
+    tsid: Tsid,
+    subject: &str,
+    worker: Account,
+    price: Balance,
+) -> Result<()> {
     exec_sql(
         tsid,
         format!(
-            "UPDATE Tasks SET status = '{}',worker = '{worker:?}' WHERE subject = '{subject}';",
+            r#"
+               UPDATE Tasks SET status = '{}',worker = '{worker:?}' WHERE subject = '{subject}';
+               INSERT INTO TaskExecution VALUES ('{subject}', '{worker:?}', '{price}');
+               "#,
             Status::InProgress
         ),
     )

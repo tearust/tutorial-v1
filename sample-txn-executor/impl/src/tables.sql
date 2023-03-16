@@ -7,3 +7,12 @@ CREATE TABLE Tasks
 	price 						TEXT,
 	required_deposit	TEXT
 );
+CREATE INDEX idx_subject ON Tasks (subject);
+
+CREATE TABLE TaskExecution
+(
+  subject TEXT,
+  worker  TEXT,
+  price   TEXT
+);
+CREATE INDEX idx_subject ON TaskExecution (subject);
