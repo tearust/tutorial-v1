@@ -64,6 +64,8 @@ impl Handle<(), Activate> for Actor {
             .collect(),
         )
         .await?;
+
+        info!("activate sample txn executor actor successfully");
         Ok(())
     }
 }
@@ -85,7 +87,7 @@ impl Handle<(), HttpRequest> for Actor {
             }
             "init" => {
                 send_tx(Txns::Init {
-                    auth_b64: Default::default(),
+                    // auth_b64: Default::default(),
                 })
                 .await?;
                 serde_json::to_vec::<[u8; 0]>(&[]).err_into()

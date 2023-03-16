@@ -33,3 +33,4 @@ pub async fn check_account(auth_b64: &str, account: Account) -> Result<()> {
 pub fn decode_auth_key(auth_b64: &str) -> Result<AuthKey> {
     deserialize(general_purpose::STANDARD.decode(auth_b64)?).err_into()
 }
+

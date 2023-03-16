@@ -16,3 +16,7 @@ then
 fi
 
 tas ../target/wasm32-unknown-unknown/release/sample_txn_executor.wasm
+
+echo "copy to dev-runner"
+cd ..
+cp -r target/wasm32-unknown-unknown/release/sample_txn_executor.wasm ../../dev-runner/local/a-node/

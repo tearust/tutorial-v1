@@ -24,9 +24,7 @@ pub enum Status {
 
 #[derive(Debug, Clone, Serialize, Deserialize, AsRefStr, Display)]
 pub enum Txns {
-    Init {
-        auth_b64: String,
-    },
+    Init {},
     CreateTask {
         task: Task,
         auth_b64: String,

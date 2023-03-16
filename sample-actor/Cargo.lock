@@ -2139,6 +2139,7 @@ dependencies = [
  "primitive-types",
  "prost",
  "sample-actor-codec",
+ "sample-txn-executor-codec",
  "serde",
  "serde_derive",
  "serde_json",
@@ -2152,6 +2153,16 @@ name = "sample-actor-codec"
 version = "0.1.0"
 dependencies = [
  "serde",
+ "tea-sdk",
+]
+
+[[package]]
+name = "sample-txn-executor-codec"
+version = "0.1.0"
+dependencies = [
+ "serde",
+ "strum",
+ "strum_macros",
  "tea-sdk",
 ]
 
@@ -2429,9 +2440,9 @@ checksum = "8ae9980cab1db3fceee2f6c6f643d5d8de2997c58ee8d25fb0cc8a9e9e7348e5"
 
 [[package]]
 name = "tea-actorx-core"
-version = "0.2.0-dev.7"
+version = "0.2.0-dev.9"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a88eea900be8ca2c42c65d1ad6a47cb7e60c2272cee36bc9a98ed62fa04096fe"
+checksum = "4b8d09445b4b2f538f41d319b9bbf273d87d5cf81c9460bd741a35027495f56f"
 dependencies = [
  "base64",
  "num-derive",
@@ -2444,9 +2455,9 @@ dependencies = [
 
 [[package]]
 name = "tea-actorx-host"
-version = "0.2.0-dev.7"
+version = "0.2.0-dev.9"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "21ae05d0f8361d13aa91b43ad579a9348dbed2e7e024fe199ff094ec6be08fdf"
+checksum = "a2f67fa9acd7bec218ba4a44919f879caaa9c007767dfcda279c44dc6fb541a0"
 dependencies = [
  "bincode",
  "crossbeam",
@@ -2467,9 +2478,9 @@ dependencies = [
 
 [[package]]
 name = "tea-actorx-macros"
-version = "0.2.0-dev.7"
+version = "0.2.0-dev.9"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "d1512cd167f1b7639994c8b20051a8a277ea6a92573b0dee0bb98c7972277e3f"
+checksum = "416583e58373fddf8c913a547cee6c50da5dd48c6f6f5d64a2fca17ea1aa9a67"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -2478,9 +2489,9 @@ dependencies = [
 
 [[package]]
 name = "tea-actorx-runtime"
-version = "0.2.0-dev.7"
+version = "0.2.0-dev.9"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "8d2092eb0c5548ed34ee4633b14a3632c7a1b90445e5ec3af525661986a8a286"
+checksum = "3b84c6f7525c84731394826e1be78b90f1a628adcce87b10ce6b8eed31ce6a9a"
 dependencies = [
  "bincode",
  "lazy_static",
@@ -2495,9 +2506,9 @@ dependencies = [
 
 [[package]]
 name = "tea-actorx-signer"
-version = "0.2.0-dev.7"
+version = "0.2.0-dev.9"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "f158a58771afa8aee6f54936aaaed9f6d04fca13dff872580db0a998db9fd57f"
+checksum = "0fab780319caaa8f014596411afcc51f4fccdd02b0abe6a28c8862fe72050c4d"
 dependencies = [
  "base64",
  "bincode",
@@ -2517,9 +2528,9 @@ dependencies = [
 
 [[package]]
 name = "tea-codec"
-version = "0.2.0-dev.7"
+version = "0.2.0-dev.9"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "fd9dffd9b58641c22ae5ad283c7b1b632c821bbb0d559927e746e0d3c557679d"
+checksum = "47bd7e74b03cd5332d4f902fe62da7fb9424aa5d981c07189854b2dce59b87d3"
 dependencies = [
  "base64",
  "bincode",
@@ -2546,9 +2557,9 @@ dependencies = [
 
 [[package]]
 name = "tea-codec-macros"
-version = "0.2.0-dev.7"
+version = "0.2.0-dev.9"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "cefc8d21dffb956b48b7cfee5dcc08372d5ce6b707a4b4f301931de316d5d6c0"
+checksum = "2fb2cd6801005c991767203fd9cebefc99d32f4982901899480bef70dbc44b66"
 dependencies = [
  "convert_case",
  "itertools",
@@ -2559,9 +2570,9 @@ dependencies = [
 
 [[package]]
 name = "tea-runtime-codec"
-version = "0.2.0-dev.7"
+version = "0.2.0-dev.9"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e1325e8536401928fcb562bb134da17202de35809affe52f4e46bcd466f3133a"
+checksum = "695d120dad8188646962e77d2a2e9dd1f1b07dc59282d6ddec8ea91f6dc9f0fe"
 dependencies = [
  "base64",
  "bincode",
@@ -2591,9 +2602,9 @@ dependencies = [
 
 [[package]]
 name = "tea-sdk"
-version = "0.2.0-dev.7"
+version = "0.2.0-dev.9"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "0e5f98875afa3a60dd328e6d97cbede3951f44e6a14d6a7b1ddda802f72629ba"
+checksum = "ac5af4859758357043ba6b5ddb377d0df331812ff6a2c090da74ad2bbbcbb858"
 dependencies = [
  "tea-actorx-core",
  "tea-actorx-macros",
@@ -2607,9 +2618,9 @@ dependencies = [
 
 [[package]]
 name = "tea-system-actors"
-version = "0.2.0-dev.7"
+version = "0.2.0-dev.9"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "cfc28ad560ed5963c16e08282cbabb9c74f6c8a1e69ff819108071075a7aac6e"
+checksum = "6dd7a4d17cd61b0f3fdd19460d7bcf9df1582e32fd7c1b560b789e098bc65ba7"
 dependencies = [
  "serde",
  "strum",
@@ -2620,9 +2631,9 @@ dependencies = [
 
 [[package]]
 name = "tea-wasm-actor-utils"
-version = "0.2.0-dev.7"
+version = "0.2.0-dev.9"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "94d5d6df12dc8be6515dde02af18477c61b7f0e3da951b5f2e1f51c15e6ad64d"
+checksum = "9f30c0ed6126854eb796bfa7257ab50cb6b742f5ed629758e7bb7fb3a32f6b43"
 dependencies = [
  "base64",
  "bytes",

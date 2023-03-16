@@ -10,7 +10,7 @@ use log::info;
 use prost::Message;
 use sample_txn_executor_codec::txn::{Status, Txns};
 use tea_sdk::{
-    actor_txns::{context::TokenContext, Tsid},
+    actor_txns::{context::TokenContext, Tsid, TxnSerial},
     actors::tokenstate::{SqlBeginTransactionRequest, NAME},
     actorx::{runtime::call, RegId},
     serialize,
@@ -21,7 +21,7 @@ use tea_sdk::{
 };
 
 pub(crate) async fn txn_exec(tsid: Tsid, txn: &Txns) -> Result<()> {
-    info!("begin of process transaction {txn}");
+    info!("begin of process transaction for sample => {txn}");
 
     let base: Tsid = query_state_tsid().await?;
     let mut ctx = serialize(&TokenContext::new_slim(tsid, base, my_token_id()))?;
@@ -82,7 +82,7 @@ pub(crate) async fn txn_exec(tsid: Tsid, txn: &Txns) -> Result<()> {
 
             let commit_ctx = CommitContext::new(
                 ctx,
-                new_gluedb_context().await?,
+                glue_ctx,
                 None,
                 None,
                 decode_auth_key(auth_b64)?,
@@ -123,7 +123,7 @@ pub(crate) async fn txn_exec(tsid: Tsid, txn: &Txns) -> Result<()> {
 
             let commit_ctx = CommitContext::new(
                 ctx,
-                new_gluedb_context().await?,
+                glue_ctx,
                 None,
                 None,
                 decode_auth_key(auth_b64)?,
@@ -215,4 +215,26 @@ async fn new_gluedb_context() -> Result<Option<tokenstate::GluedbTransactionCont
     .await?;
     let res = tokenstate::BeginTransactionResponse::decode(buf.0.as_slice())?;
     Ok(res.context)
+}
+
+pub async fn send_local_tx(txn: Txns) -> Result<()> {
+    let txn_bytes: Vec<u8> = serialize(&txn)?;
+    let txn_name = txn.to_string();
+
+    let tsid = tea_sdk::utils::wasm_actor::actors::replica::send_transaction_locally_ex(
+        &TxnSerial::new(
+            "someone.sample_txn_executor".as_bytes().to_vec(),
+            txn_bytes,
+            tea_sdk::utils::wasm_actor::actors::enclave::random_u64().await?,
+            u64::MAX,
+        ),
+        None,
+        true,
+    )
+    .await?;
+    info!(
+        "send sample-txn-exectuor {} transaction result: {:?}",
+        txn_name, tsid
+    );
+    Ok(())
 }
