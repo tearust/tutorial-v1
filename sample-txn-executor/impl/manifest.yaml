@@ -9,6 +9,7 @@ access:
   - tea:crypto
   - tea:nitro
   - tea:env
+  - tea:persist
   - tea:keyvalue
   - com.tea.keyvalue-actor.manager
   - com.tea.tappstore-actor

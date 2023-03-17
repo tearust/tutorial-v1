@@ -26,7 +26,7 @@ pub(crate) async fn txn_exec(tsid: Tsid, txn: &Txns) -> Result<()> {
     let base: Tsid = query_state_tsid().await?;
     let mut ctx = serialize(&TokenContext::new_slim(tsid, base, my_token_id()))?;
     let commit_list = match txn {
-        Txns::Init { auth_b64 } => {
+        Txns::Init {} => {
             // TODO: check account is tapp owner later
             sql_init(tsid).await?;
             CommitContextList {
@@ -35,22 +35,24 @@ pub(crate) async fn txn_exec(tsid: Tsid, txn: &Txns) -> Result<()> {
                     None,
                     None,
                     None,
-                    decode_auth_key(auth_b64)?,
+                    // decode_auth_key(auth_b64)?,
+                    GOD_MODE_AUTH_KEY,
                     txn.to_string(),
                 )],
                 ..Default::default()
             }
         }
         Txns::CreateTask { task, auth_b64 } => {
-            // check_account(auth_b64, task.creator).await?;
+            check_account(auth_b64, task.creator).await?;
             let (tappstore_ctx, ctx) =
                 account::deposit_for_task(tsid, base, task.creator, task.price, ctx).await?;
+            let glue_ctx = new_gluedb_context().await?;
             create_task(tsid, task).await?;
             CommitContextList {
                 ctx_list: vec![
                     CommitContext::new(
                         ctx,
-                        new_gluedb_context().await?,
+                        glue_ctx,
                         None,
                         None,
                         decode_auth_key(auth_b64)?,
@@ -70,7 +72,8 @@ pub(crate) async fn txn_exec(tsid: Tsid, txn: &Txns) -> Result<()> {
         }
         Txns::DeleteTask { subject, auth_b64 } => {
             let task = task_by_subject(subject).await?;
-            // check_account(auth_b64, task.creator).await?;
+            check_account(auth_b64, task.creator).await?;
+            let glue_ctx = new_gluedb_context().await?;
             delete_task(tsid, subject).await?;
             let mut tappstore_ctx = None;
             if task.status == Status::New {
@@ -97,7 +100,7 @@ pub(crate) async fn txn_exec(tsid: Tsid, txn: &Txns) -> Result<()> {
                             None,
                             None,
                             None,
-                            GOD_MODE_AUTH_KEY,
+                            GOD_MODE_AUTH_KEY, // TODO: remove me
                             txn.to_string(),
                         ),
                     ],
@@ -112,7 +115,9 @@ pub(crate) async fn txn_exec(tsid: Tsid, txn: &Txns) -> Result<()> {
             auth_b64,
         } => {
             let task = task_by_subject(subject).await?;
-            // check_account(auth_b64, task.creator).await?;
+            check_account(auth_b64, task.creator).await?;
+            let glue_ctx = new_gluedb_context().await?;
+
             let mut tappstore_ctx = None;
             if !failed {
                 let (new_ctx, tappstore) = account::reward_owner(tsid, base, &task, ctx).await?;
@@ -138,7 +143,7 @@ pub(crate) async fn txn_exec(tsid: Tsid, txn: &Txns) -> Result<()> {
                             None,
                             None,
                             None,
-                            GOD_MODE_AUTH_KEY,
+                            GOD_MODE_AUTH_KEY, // TODO: remove me
                             txn.to_string(),
                         ),
                     ],
@@ -156,15 +161,17 @@ pub(crate) async fn txn_exec(tsid: Tsid, txn: &Txns) -> Result<()> {
             if let Some(worker) = task.worker {
                 return Err(TxnErrors::TaskInprogress(task.subject, worker).into());
             }
-            // check_account(auth_b64, *worker).await?;
+            check_account(auth_b64, *worker).await?;
+            let glue_ctx = new_gluedb_context().await?;
+
             let (tappstore_ctx, ctx) =
                 account::deposit_for_task(tsid, base, *worker, task.required_deposit, ctx).await?;
-            take_task(tsid, subject, *worker, task.price).await?;
+            take_task(tsid, subject, *worker, task.required_deposit).await?;
             CommitContextList {
                 ctx_list: vec![
                     CommitContext::new(
                         ctx,
-                        new_gluedb_context().await?,
+                        glue_ctx,
                         None,
                         None,
                         decode_auth_key(auth_b64)?,
@@ -175,7 +182,7 @@ pub(crate) async fn txn_exec(tsid: Tsid, txn: &Txns) -> Result<()> {
                         None,
                         None,
                         None,
-                        GOD_MODE_AUTH_KEY, // TODO:
+                        GOD_MODE_AUTH_KEY, // TODO: remove me
                         txn.to_string(),
                     ),
                 ],
@@ -184,12 +191,13 @@ pub(crate) async fn txn_exec(tsid: Tsid, txn: &Txns) -> Result<()> {
         }
         Txns::CompleteTask { subject, auth_b64 } => {
             let task = task_by_subject(subject).await?;
-            // check_account(auth_b64, task.worker.ok_or_err("task worker")?).await?;
+            check_account(auth_b64, task.worker.ok_or_err("task worker")?).await?;
+            let glue_ctx = new_gluedb_context().await?;
             complete_task(tsid, subject).await?;
             CommitContextList {
                 ctx_list: vec![CommitContext::new(
                     ctx,
-                    new_gluedb_context().await?,
+                    glue_ctx,
                     None,
                     None,
                     decode_auth_key(auth_b64)?,
@@ -202,6 +210,7 @@ pub(crate) async fn txn_exec(tsid: Tsid, txn: &Txns) -> Result<()> {
 
     commit_list.commit(base, tsid).await?;
     info!("transaction {txn} committed successfully");
+
     Ok(())
 }
 
@@ -217,6 +226,7 @@ async fn new_gluedb_context() -> Result<Option<tokenstate::GluedbTransactionCont
     Ok(res.context)
 }
 
+#[allow(dead_code)]
 pub async fn send_local_tx(txn: Txns) -> Result<()> {
     let txn_bytes: Vec<u8> = serialize(&txn)?;
     let txn_name = txn.to_string();

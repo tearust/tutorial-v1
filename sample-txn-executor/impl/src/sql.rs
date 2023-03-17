@@ -43,9 +43,11 @@ pub(crate) async fn sum_task_deposit(subject: &str) -> Result<Balance> {
     let rows = query_select_rows(&payload)?;
     let mut sum = Balance::zero();
     for row in rows {
-        let price: Balance =
-            sql_value_to_string(row.get_value_by_index(0).ok_or_err("price")?)?.parse()?;
-        sum += sum.checked_add(price).ok_or_err("add overflow")?;
+        let price = Balance::from_str_radix(
+            &sql_value_to_string(row.get_value_by_index(0).ok_or_err("price")?)?,
+            10,
+        )?;
+        sum = sum.checked_add(price).ok_or_err("add overflow")?;
     }
     Ok(sum)
 }
@@ -54,12 +56,19 @@ pub(crate) async fn create_task(tsid: Tsid, task: &Task) -> Result<()> {
     exec_sql(
         tsid,
         format!(
-            "INSERT INTO Tasks VALUES ('{}','{:?}',NULL,'{}','{}','{}');",
-            task.subject,
-            task.creator,
-            Status::New,
-            task.price,
-            task.required_deposit
+            r#"
+            INSERT INTO Tasks VALUES (
+                '{subject}','{creator:?}',NULL,'{status}','{price}','{required_deposit}'
+            );
+            INSERT INTO TaskExecution VALUES (
+                '{subject}', '{creator:?}', '{price}'
+            );
+            "#,
+            subject = task.subject,
+            creator = task.creator,
+            status = Status::New,
+            price = task.price,
+            required_deposit = task.required_deposit
         ),
     )
     .await
@@ -97,14 +106,18 @@ pub(crate) async fn take_task(
     tsid: Tsid,
     subject: &str,
     worker: Account,
-    price: Balance,
+    required_deposit: Balance,
 ) -> Result<()> {
     exec_sql(
         tsid,
         format!(
             r#"
-               UPDATE Tasks SET status = '{}',worker = '{worker:?}' WHERE subject = '{subject}';
-               INSERT INTO TaskExecution VALUES ('{subject}', '{worker:?}', '{price}');
+            UPDATE Tasks SET 
+                status = '{}',worker = '{worker:?}' 
+                WHERE subject = '{subject}';
+            INSERT INTO TaskExecution VALUES (
+                '{subject}', '{worker:?}', '{required_deposit}'
+            );
                "#,
             Status::InProgress
         ),
@@ -162,10 +175,13 @@ fn parse_task(v: &Row) -> Result<Task> {
             .map(|v| v.parse())
             .transpose()?,
         status: sql_value_to_string(v.get_value_by_index(3).ok_or_err("status")?)?.parse()?,
-        price: sql_value_to_string(v.get_value_by_index(4).ok_or_err("price")?)?.parse()?,
-        required_deposit: sql_value_to_string(
-            v.get_value_by_index(5).ok_or_err("required_deposit")?,
-        )?
-        .parse()?,
+        price: Balance::from_str_radix(
+            &sql_value_to_string(v.get_value_by_index(4).ok_or_err("price")?)?,
+            10,
+        )?,
+        required_deposit: Balance::from_str_radix(
+            &sql_value_to_string(v.get_value_by_index(5).ok_or_err("required_deposit")?)?,
+            10,
+        )?,
     })
 }
