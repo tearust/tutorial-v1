@@ -22,7 +22,14 @@ const F = {
       await succ_cb();
     } catch (e) {
       console.error(e);
-      self.$root.showError('Init DB failed.');
+      let json = utils.parseJSON(e, false);
+      if(json){
+        self.$root.showError(json.summary);
+      }
+      else{
+        self.$root.showError('Init DB failed.');
+      }
+      
     }
     self.$root.loading(false);
   },
@@ -37,7 +44,13 @@ const F = {
       await succ_cb();
     } catch (e) {
       console.error(e);
-      self.$root.showError('Init Token failed.');
+      let json = utils.parseJSON(e, false);
+      if(json){
+        self.$root.showError(json.summary);
+      }
+      else{
+        self.$root.showError('Init Token failed.');
+      }
     }
     self.$root.loading(false);
   },

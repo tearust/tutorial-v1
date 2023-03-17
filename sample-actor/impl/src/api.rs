@@ -9,7 +9,7 @@ use tea_sdk::tapp::{DOLLARS, Account, Balance, TokenId};
 use crate::types::*;
 use tea_sdk::utils::client_wasm_actor::{help, check_auth, request, Result};
 use sample_txn_executor_codec::{
-	TaskQueryRequest, TaskQueryResponse,
+	TaskQueryRequest,
 	txn::{Task, Status, Txns}
 };
 
@@ -89,9 +89,9 @@ pub async fn query_task_list(payload: Vec<u8>, from_actor: String) -> Result<Vec
 		TARGET_ACTOR,
 		move |res| {
 			Box::pin(async move {
-				let r: TaskQueryResponse  = res;
+				let r: Vec<Task>  = res.0;
 				let x = serde_json::json!({
-					"list": r,
+					"list": format_task(r)?,
 				});
 				info!("query_task_list => {:?}", x);
 				help::cache_json_with_uuid(&uuid, x).await?;
@@ -102,6 +102,29 @@ pub async fn query_task_list(payload: Vec<u8>, from_actor: String) -> Result<Vec
 	.await?;
 
 	help::result_ok()
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct WrapTask {
+	pub creator: Account,
+	pub subject: String,
+	pub price: String,
+	pub required_deposit: String,
+	pub status: Status,
+	pub worker: Option<Account>,
+}
+fn format_task(data: Vec<Task>) -> Result<Vec<WrapTask>> {
+	let r = data.iter().map(|item| {
+		WrapTask { 
+			creator: item.creator, 
+			subject: item.subject.clone(), 
+			price: format!("{:x}", item.price), 
+			required_deposit: format!("{:x}", item.required_deposit), 
+			status: item.status, 
+			worker: item.worker 
+		}
+	}).collect();
+	Ok(r)
 }
 
 pub async fn delete_task(payload: Vec<u8>, from_actor: String) -> Result<Vec<u8>> {
