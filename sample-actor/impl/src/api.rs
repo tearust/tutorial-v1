@@ -5,7 +5,7 @@ use tea_sdk::utils::wasm_actor::actors::{
 	env::{tappstore_id},
 };
 use primitive_types::H160;
-use tea_sdk::tapp::{DOLLARS, Account, Balance};
+use tea_sdk::tapp::{DOLLARS, Account, Balance, TokenId};
 use crate::types::*;
 use tea_sdk::utils::client_wasm_actor::{help, check_auth, request, Result};
 use sample_txn_executor_codec::{
@@ -199,5 +199,45 @@ pub async fn complete_task(payload: Vec<u8>, from_actor: String) -> Result<Vec<u
 	)
 	.await?;
 
+	help::result_ok()
+}
+
+pub async fn init_db(payload: Vec<u8>, from_actor: String) -> Result<Vec<u8>> {
+	let req: InitAppDBRequest = serde_json::from_slice(&payload)?;
+	info!("Init DB action...");
+
+	let txn = Txns::Init {};
+
+	request::send_custom_txn(
+		&from_actor,
+		"complete_task",
+		&req.uuid,
+		tea_sdk::serialize(&req)?,
+		tea_sdk::serialize(&txn)?,
+		vec![],
+		TARGET_ACTOR,
+	)
+	.await?;
+
+	help::result_ok()
+}
+
+pub async fn init_token(payload: Vec<u8>, from_actor: String) -> Result<Vec<u8>> {
+	let req: InitAppTokenRequest = serde_json::from_slice(&payload)?;
+	info!("Init token action...");
+
+	let txn = TappstoreTxn::GenAesKey {
+    token_id: TokenId::from_hex(&req.token_id)?,
+	};
+
+	request::send_tappstore_txn(
+		&from_actor,
+		"faucet_txn",
+		&req.uuid,
+		tea_sdk::serialize(&req)?,
+		txn,
+		vec![],
+	)
+	.await?;
 	help::result_ok()
 }

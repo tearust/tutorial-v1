@@ -30,8 +30,6 @@ mod sql;
 mod txn;
 mod utils;
 
-const INIT_TAPP_KEY: &'static str = "InitTappKey";
-
 actor!(Actor);
 
 #[derive(Default, Clone)]
@@ -44,8 +42,7 @@ impl Handles<()> for Actor {
         HttpRequest,
         TaskQueryRequest,
         ExecTxnCast,
-        ActorTxnCheckMessage,
-        RandomTickCast
+        ActorTxnCheckMessage
     ];
 }
 
@@ -53,14 +50,6 @@ impl Handle<(), Activate> for Actor {
     async fn handle(self, _: Activate, _: ()) -> Result<()> {
         info!("activate sample txn executor actor successfully");
         register_adapter_http_dispatcher(vec!["query-tasks".to_string()]).await?;
-
-        register_random_tick(RandomTickArgs {
-            subject: "tapp.default".to_string(),
-            start: 2000,
-            end: 6000,
-            gas_limit: 0_u64,
-        })
-        .await?;
 
         info!("activate sample txn executor actor successfully");
         Ok(())
@@ -133,25 +122,4 @@ async fn query_tasks_by_filter(req: TaskQueryRequest) -> Result<Vec<Task>> {
                 .map_or_else(|| true, |subject| subject == &v.subject)
         })
         .collect())
-}
-
-impl Handle<(), RandomTickCast> for Actor {
-    async fn handle(
-        self,
-        RandomTickCast(_subject, _ts): RandomTickCast,
-        _caller: (),
-    ) -> Result<()> {
-        let app_init = has_tapp_init().await?;
-        if !app_init {
-            txn::init_app_token().await?;
-            txn::init_app_db().await?;
-            kvp::set_forever(INIT_TAPP_KEY, &true).await?;
-            info!("init tapp db and token success.");
-        }
-        Ok(())
-    }
-}
-
-async fn has_tapp_init() -> Result<bool> {
-    Ok(kvp::get::<bool>(INIT_TAPP_KEY).await?.unwrap_or(false))
 }

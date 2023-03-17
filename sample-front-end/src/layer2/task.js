@@ -11,6 +11,36 @@ import user from './user';
 
 
 const F = {
+  async initDB(self, succ_cb){
+    self.$root.loading(true);
+    try {
+      await txn.txn_request('init_db', {
+        tokenId: base.getTappId(),
+        address: self.layer1_account.address,
+      });
+      self.$root.alert_success();
+      await succ_cb();
+    } catch (e) {
+      console.error(e);
+      self.$root.showError('Init DB failed.');
+    }
+    self.$root.loading(false);
+  },
+  async initToken(self, succ_cb){
+    self.$root.loading(true);
+    try {
+      await txn.txn_request('init_token', {
+        tokenId: base.getTappId(),
+        address: self.layer1_account.address,
+      });
+      self.$root.alert_success();
+      await succ_cb();
+    } catch (e) {
+      console.error(e);
+      self.$root.showError('Init Token failed.');
+    }
+    self.$root.loading(false);
+  },
   async createNewTask(self, param={}, succ_cb){
     const session_key = user.checkLogin(self);
 

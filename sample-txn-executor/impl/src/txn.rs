@@ -10,12 +10,8 @@ use log::info;
 use prost::Message;
 use sample_txn_executor_codec::txn::{Status, Txns};
 use tea_sdk::{
-    actor_txns::{context::TokenContext, Tsid, TxnSerial},
-    actors::{
-        tappstore::txns::TappstoreTxn,
-        tappstore::NAME as TAPPSTORE_NAME,
-        tokenstate::{SqlBeginTransactionRequest, NAME},
-    },
+    actor_txns::{context::TokenContext, Tsid},
+    actors::tokenstate::{SqlBeginTransactionRequest, NAME},
     actorx::{runtime::call, RegId},
     serialize,
     tapp::GOD_MODE_AUTH_KEY,
@@ -31,7 +27,6 @@ pub(crate) async fn txn_exec(tsid: Tsid, txn: &Txns) -> Result<()> {
     let mut ctx = serialize(&TokenContext::new_slim(tsid, base, my_token_id()))?;
     let commit_list = match txn {
         Txns::Init {} => {
-            // TODO: check account is tapp owner later
             sql_init(tsid).await?;
             CommitContextList {
                 ctx_list: vec![CommitContext::new(
@@ -240,38 +235,4 @@ async fn new_gluedb_context() -> Result<Option<tokenstate::GluedbTransactionCont
     .await?;
     let res = tokenstate::BeginTransactionResponse::decode(buf.0.as_slice())?;
     Ok(res.context)
-}
-
-pub async fn init_app_db() -> Result<()> {
-    let txn_bytes = tea_sdk::serialize(&Txns::Init {})?;
-    tea_sdk::utils::wasm_actor::actors::replica::send_transaction_locally_ex(
-        &TxnSerial::new(
-            "someone.sample_txn_executor".as_bytes().to_vec(),
-            txn_bytes,
-            tea_sdk::utils::wasm_actor::actors::enclave::random_u64().await?,
-            u64::MAX,
-        ),
-        None,
-        true,
-    )
-    .await?;
-    Ok(())
-}
-
-pub async fn init_app_token() -> Result<()> {
-    let token_id = my_token_id();
-    let txn = TappstoreTxn::GenAesKey { token_id };
-    let txn_bytes = tea_sdk::serialize(&txn)?;
-    tea_sdk::utils::wasm_actor::actors::replica::send_transaction_locally_ex(
-        &TxnSerial::new(
-            TAPPSTORE_NAME.to_vec(),
-            txn_bytes,
-            tea_sdk::utils::wasm_actor::actors::enclave::random_u64().await?,
-            u64::MAX,
-        ),
-        None,
-        true,
-    )
-    .await?;
-    Ok(())
 }
