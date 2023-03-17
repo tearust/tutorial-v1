@@ -6,7 +6,8 @@ import {ContractMap} from '../eth/consts';
 const meta = {
   type: utils.get_env('TAPP_TYPE') || 'tapp',  // tappstore, miner, tapp
   sudo: utils.get_env('LAYER1_SUDO') || 'NO_SUDO_ACCOUNT',
-  tapp_id: _.toLower(ContractMap.ERC20),
+  tappstore_id: _.toLower(ContractMap.ERC20),
+  tapp_id: utils.get_env("TAPP_ID"),
   server_url: utils.get_env('LAYER2_URL'),
   mode: utils.get_env('mode') || 'app',
   server_actor: 'someone.sample',
@@ -72,6 +73,9 @@ const F = {
   },
   getTappId(){
     return meta.tapp_id;
+  },
+  getTappstoreId(){
+    return meta.tappstore_id;
   },
   getAxios(){
     return _axios;

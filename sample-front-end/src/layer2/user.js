@@ -342,7 +342,7 @@ const F = {
     });
   },
 
-  async query_balance(self, target = null, target_tapp = null,) {
+  async query_balance(self) {
     const session_key = F.checkLogin(self);
 
     const opts = {
@@ -350,10 +350,8 @@ const F = {
       tappIdB64: base.getTappId(),
       authB64: session_key,
     };
-    if (target) {
-      opts.target = target;
-      opts.targetTappIdB64 = target_tapp;
-    }
+    opts.target = self.layer1_account.address;
+    opts.targetTappIdB64 = base.getTappstoreId();
 
     try {
       const rs = await txn.query_request('query_balance', opts);
