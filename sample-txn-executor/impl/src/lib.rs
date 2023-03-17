@@ -9,16 +9,13 @@ use sample_txn_executor_codec::{
     *,
 };
 use sql::query_all_tasks;
-use tea_sdk::actors::tokenstate::{RandomTickArgs, RandomTickCast};
 use tea_sdk::{
     actors::{adapter::HttpRequest, replica::ExecTxnCast, state_receiver::ActorTxnCheckMessage},
     actorx::runtime::{actor, Activate, PreInvoke},
     deserialize,
     serde::handle::{Handle, Handles},
     utils::wasm_actor::{
-        action::process_txn_error,
-        actors::adapter::register_adapter_http_dispatcher,
-        actors::{env::register_random_tick, kvp},
+        action::process_txn_error, actors::adapter::register_adapter_http_dispatcher,
         logging::set_logging,
     },
     Handle, ResultExt,

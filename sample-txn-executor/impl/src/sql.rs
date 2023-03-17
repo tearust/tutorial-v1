@@ -52,6 +52,16 @@ pub(crate) async fn sum_task_deposit(subject: &str) -> Result<Balance> {
     Ok(sum)
 }
 
+pub(crate) async fn has_task_executed(subject: &str) -> Result<bool> {
+    let payload = sql_query_first(
+        my_token_id(),
+        format!("SELECT price FROM TaskExecution where subject='{subject}';"),
+    )
+    .await?;
+    let rows = query_select_rows(&payload)?;
+    Ok(rows.len() > 1)
+}
+
 pub(crate) async fn create_task(tsid: Tsid, task: &Task) -> Result<()> {
     exec_sql(
         tsid,

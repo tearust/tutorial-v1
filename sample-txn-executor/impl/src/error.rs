@@ -32,4 +32,7 @@ pub enum TxnErrors {
 
     #[error("Task can only be finished when status is in process")]
     CompleteTaskFailed,
+
+    #[error("This task has been executed (with failed results) that can't be deleted")]
+    CanNotDeleteExecutedTask,
 }

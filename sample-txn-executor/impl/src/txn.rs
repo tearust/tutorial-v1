@@ -2,7 +2,8 @@ use crate::{
     account,
     error::{Result, TxnErrors},
     sql::{
-        complete_task, create_task, delete_task, sql_init, take_task, task_by_subject, verify_task,
+        complete_task, create_task, delete_task, has_task_executed, sql_init, take_task,
+        task_by_subject, verify_task,
     },
     utils::{check_account, decode_auth_key, my_token_id},
 };
@@ -14,7 +15,7 @@ use tea_sdk::{
     actors::tokenstate::{SqlBeginTransactionRequest, NAME},
     actorx::{runtime::call, RegId},
     serialize,
-    tapp::GOD_MODE_AUTH_KEY,
+    tapp::RECEIPTING_AUTH_KEY,
     utils::wasm_actor::actors::statemachine::{query_state_tsid, CommitContext, CommitContextList},
     vmh::message::{encode_protobuf, structs_proto::tokenstate},
     OptionExt,
@@ -24,20 +25,12 @@ pub(crate) async fn txn_exec(tsid: Tsid, txn: &Txns) -> Result<()> {
     info!("begin of process transaction for sample => {txn}");
 
     let base: Tsid = query_state_tsid().await?;
-    let mut ctx = serialize(&TokenContext::new_slim(tsid, base, my_token_id()))?;
+    let ctx = serialize(&TokenContext::new_slim(tsid, base, my_token_id()))?;
     let commit_list = match txn {
         Txns::Init {} => {
             sql_init(tsid).await?;
             CommitContextList {
-                ctx_list: vec![CommitContext::new(
-                    ctx,
-                    None,
-                    None,
-                    None,
-                    // decode_auth_key(auth_b64)?,
-                    GOD_MODE_AUTH_KEY,
-                    txn.to_string(),
-                )],
+                ctx_list: vec![CommitContext::ctx_receipting(ctx, txn.to_string())],
                 ..Default::default()
             }
         }
@@ -57,14 +50,7 @@ pub(crate) async fn txn_exec(tsid: Tsid, txn: &Txns) -> Result<()> {
                         decode_auth_key(auth_b64)?,
                         txn.to_string(),
                     ),
-                    CommitContext::new(
-                        tappstore_ctx,
-                        None,
-                        None,
-                        None,
-                        GOD_MODE_AUTH_KEY,
-                        txn.to_string(),
-                    ),
+                    CommitContext::ctx_receipting(tappstore_ctx, txn.to_string()),
                 ],
                 ..Default::default()
             }
@@ -74,41 +60,43 @@ pub(crate) async fn txn_exec(tsid: Tsid, txn: &Txns) -> Result<()> {
             if task.status != Status::New && task.status != Status::Done {
                 return Err(TxnErrors::DeleteTaskFailed.into());
             }
+            if has_task_executed(subject).await? {
+                return Err(TxnErrors::CanNotDeleteExecutedTask.into());
+            }
             check_account(auth_b64, task.creator).await?;
             let glue_ctx = new_gluedb_context().await?;
             delete_task(tsid, subject).await?;
-            let mut tappstore_ctx = None;
-            if task.status == Status::New {
-                let (new_ctx, tappstore) =
-                    account::rollback_deposit(tsid, base, &task, ctx).await?;
-                ctx = new_ctx;
-                tappstore_ctx = Some(tappstore);
-            }
 
-            let commit_ctx = CommitContext::new(
-                ctx,
-                glue_ctx,
-                None,
-                None,
-                decode_auth_key(auth_b64)?,
-                txn.to_string(),
-            );
-            CommitContextList {
-                ctx_list: match tappstore_ctx {
-                    Some(tappstore_ctx) => vec![
-                        commit_ctx,
+            if task.status == Status::New {
+                let (new_ctx, tappstore_ctx) =
+                    account::rollback_deposit(tsid, base, &task, ctx).await?;
+
+                CommitContextList {
+                    ctx_list: vec![
                         CommitContext::new(
-                            tappstore_ctx,
+                            new_ctx,
+                            glue_ctx,
                             None,
                             None,
-                            None,
-                            GOD_MODE_AUTH_KEY, // TODO: remove me
+                            RECEIPTING_AUTH_KEY,
                             txn.to_string(),
                         ),
+                        CommitContext::ctx_receipting(tappstore_ctx, txn.to_string()),
                     ],
-                    None => vec![commit_ctx],
-                },
-                ..Default::default()
+                    ..Default::default()
+                }
+            } else {
+                CommitContextList {
+                    ctx_list: vec![CommitContext::new(
+                        ctx,
+                        glue_ctx,
+                        None,
+                        None,
+                        decode_auth_key(auth_b64)?,
+                        txn.to_string(),
+                    )],
+                    ..Default::default()
+                }
             }
         }
         Txns::VerifyTask {
@@ -123,38 +111,37 @@ pub(crate) async fn txn_exec(tsid: Tsid, txn: &Txns) -> Result<()> {
             check_account(auth_b64, task.creator).await?;
             let glue_ctx = new_gluedb_context().await?;
 
-            let mut tappstore_ctx = None;
-            if !failed {
-                let (new_ctx, tappstore) = account::reward_owner(tsid, base, &task, ctx).await?;
-                ctx = new_ctx;
-                tappstore_ctx = Some(tappstore);
-            }
             verify_task(tsid, subject, *failed).await?;
+            if !failed {
+                let (new_ctx, tappstore_ctx) =
+                    account::reward_owner(tsid, base, &task, ctx).await?;
 
-            let commit_ctx = CommitContext::new(
-                ctx,
-                glue_ctx,
-                None,
-                None,
-                decode_auth_key(auth_b64)?,
-                txn.to_string(),
-            );
-            CommitContextList {
-                ctx_list: match tappstore_ctx {
-                    Some(tappstore_ctx) => vec![
-                        commit_ctx,
+                CommitContextList {
+                    ctx_list: vec![
                         CommitContext::new(
-                            tappstore_ctx,
+                            new_ctx,
+                            glue_ctx,
                             None,
                             None,
-                            None,
-                            GOD_MODE_AUTH_KEY, // TODO: remove me
+                            RECEIPTING_AUTH_KEY,
                             txn.to_string(),
                         ),
+                        CommitContext::ctx_receipting(tappstore_ctx, txn.to_string()),
                     ],
-                    None => vec![commit_ctx],
-                },
-                ..Default::default()
+                    ..Default::default()
+                }
+            } else {
+                CommitContextList {
+                    ctx_list: vec![CommitContext::new(
+                        ctx,
+                        glue_ctx,
+                        None,
+                        None,
+                        decode_auth_key(auth_b64)?,
+                        txn.to_string(),
+                    )],
+                    ..Default::default()
+                }
             }
         }
         Txns::TakeTask {
@@ -185,14 +172,7 @@ pub(crate) async fn txn_exec(tsid: Tsid, txn: &Txns) -> Result<()> {
                         decode_auth_key(auth_b64)?,
                         txn.to_string(),
                     ),
-                    CommitContext::new(
-                        tappstore_ctx,
-                        None,
-                        None,
-                        None,
-                        GOD_MODE_AUTH_KEY, // TODO: remove me
-                        txn.to_string(),
-                    ),
+                    CommitContext::ctx_receipting(tappstore_ctx, txn.to_string()),
                 ],
                 ..Default::default()
             }
