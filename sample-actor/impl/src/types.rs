@@ -71,3 +71,17 @@ pub struct CompleteTaskRequest {
 pub struct QueryTaskRequest {
   pub uuid: String,
 }
+
+#[derive(Debug, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct InitAppTokenRequest {
+  pub token_id: String, 
+  pub uuid: String,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct InitAppDBRequest {
+  pub token_id: String, 
+  pub uuid: String,
+}

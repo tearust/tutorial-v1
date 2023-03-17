@@ -5,6 +5,7 @@ import Home from './views/Home';
 import LoginPage from './views/LoginPage';
 import AccountProfile from './views/AccountProfile';
 import TaskMain from './views/TaskMain';
+import Admin from './views/Admin';
 
 Vue.use(Router);
 
@@ -18,6 +19,11 @@ let routers = [
     path: '/welcome',
     name: 'welcome',
     component: Home,
+  },
+  {
+    path: '/admin',
+    name: 'admin',
+    component: Admin,
   },
   {
     path: '/login_page',

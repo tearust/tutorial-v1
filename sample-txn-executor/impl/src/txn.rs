@@ -15,7 +15,7 @@ use tea_sdk::{
     serialize,
     utils::wasm_actor::actors::statemachine::{query_state_tsid, CommitContext, CommitContextList},
     vmh::message::{encode_protobuf, structs_proto::tokenstate},
-    OptionExt,
+    OptionExt, tapp::GOD_MODE_AUTH_KEY,
 };
 
 pub(crate) async fn txn_exec(tsid: Tsid, txn: &Txns) -> Result<()> {
@@ -25,15 +25,14 @@ pub(crate) async fn txn_exec(tsid: Tsid, txn: &Txns) -> Result<()> {
     let ctx = serialize(&TokenContext::new_slim(tsid, base, my_token_id()))?;
     let commit_ctx = match txn {
         Txns::Init {} => {
-            // TODO: check account is tapp owner later
             sql_init(tsid).await?;
+            // init_app_token().await?;
             CommitContext::new(
                 ctx,
                 None,
                 None,
                 None,
-                // decode_auth_key(auth_b64)?,
-                10001_u128,
+                GOD_MODE_AUTH_KEY,
                 txn.to_string(),
             )
         }
@@ -140,21 +139,21 @@ async fn new_gluedb_context() -> Result<Option<tokenstate::GluedbTransactionCont
     Ok(res.context)
 }
 
-pub async fn init_app_db() -> Result<()> {
-    let txn_bytes = tea_sdk::serialize(&Txns::Init{})?;
-    tea_sdk::utils::wasm_actor::actors::replica::send_transaction_locally_ex(
-        &TxnSerial::new(
-            "someone.sample_txn_executor".as_bytes().to_vec(),
-            txn_bytes,
-            tea_sdk::utils::wasm_actor::actors::enclave::random_u64().await?,
-            u64::MAX,
-        ),
-        None,
-        true,
-    )
-    .await?;
-    Ok(())
-}
+// pub async fn init_app_db() -> Result<()> {
+//     let txn_bytes = tea_sdk::serialize(&Txns::Init{})?;
+//     tea_sdk::utils::wasm_actor::actors::replica::send_transaction_locally_ex(
+//         &TxnSerial::new(
+//             "someone.sample_txn_executor".as_bytes().to_vec(),
+//             txn_bytes,
+//             tea_sdk::utils::wasm_actor::actors::enclave::random_u64().await?,
+//             u64::MAX,
+//         ),
+//         None,
+//         true,
+//     )
+//     .await?;
+//     Ok(())
+// }
 
 pub async fn init_app_token() -> Result<()> {
     let token_id = my_token_id();
