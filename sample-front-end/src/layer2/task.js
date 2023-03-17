@@ -22,13 +22,7 @@ const F = {
       await succ_cb();
     } catch (e) {
       console.error(e);
-      let json = utils.parseJSON(e, false);
-      if(json){
-        self.$root.showError(json.summary);
-      }
-      else{
-        self.$root.showError('Init DB failed.');
-      }
+      self.$root.showError(e.toString());
       
     }
     self.$root.loading(false);
@@ -44,13 +38,7 @@ const F = {
       await succ_cb();
     } catch (e) {
       console.error(e);
-      let json = utils.parseJSON(e, false);
-      if(json){
-        self.$root.showError(json.summary);
-      }
-      else{
-        self.$root.showError('Init Token failed.');
-      }
+      self.$root.showError(e.toString());
     }
     self.$root.loading(false);
   },
@@ -102,7 +90,7 @@ const F = {
           await succ_cb();
         } catch (e) {
           console.error(e);
-          self.$root.showError('Create task failed.');
+          self.$root.showError(e.toString());
         }
         close();
         self.$root.loading(false);
@@ -134,7 +122,7 @@ const F = {
       await succ_cb();
     } catch (e) {
       console.error(e);
-      self.$root.showError('Delete task failed.');
+      self.$root.showError(e.toString());
     }
     self.$root.loading(false);
   },
@@ -162,7 +150,7 @@ const F = {
       await succ_cb();
     } catch (e) {
       console.error(e);
-      self.$root.showError('Take task failed.');
+      self.$root.showError(e.toString());
     }
     self.$root.loading(false);
   },
@@ -190,7 +178,7 @@ const F = {
       await succ_cb();
     } catch (e) {
       console.error(e);
-      self.$root.showError('Complete task failed.');
+      self.$root.showError(e.toString());
     }
     self.$root.loading(false);
   },
@@ -219,7 +207,7 @@ const F = {
       await succ_cb();
     } catch (e) {
       console.error(e);
-      self.$root.showError('Verify task failed.');
+      self.$root.showError(e.toString());
     }
     self.$root.loading(false);
   },
@@ -228,8 +216,14 @@ const F = {
       address: self.layer1_account.address,
     });
     return _.map(rs.list, (item)=>{
-      item.price = utils.layer1.balanceToAmount(item.price.replace('0x', ''));
-      item.deposit = utils.layer1.balanceToAmount(item.required_deposit.replace('0x', ''));
+      try{
+        item.price = utils.layer1.balanceToAmount(item.price);
+        item.deposit = utils.layer1.balanceToAmount(item.required_deposit);
+      }catch(e){
+        item.price = utils.layer1.balanceToAmount(utils.toBN('0x'+item.price).toString());
+        item.deposit = utils.layer1.balanceToAmount(utils.toBN('0x'+item.required_deposit).toString());
+      }
+      
       return item;
     });
   }

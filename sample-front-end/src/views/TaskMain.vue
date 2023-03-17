@@ -58,7 +58,7 @@
         <TeaIconButton v-if="$root.eq(scope.row.creator, user.address) && scope.row.status==='WaitForVerification'" tip="Verify failed" icon="NA" title="Reject" @click="verifyTask(scope.row, false)" />
 
 
-        <TeaIconButton v-if="$root.eq(scope.row.creator, user.address)" tip="Remove task" icon="NA" title="Remove" @click="deleteTask(scope.row)" />
+        <TeaIconButton v-if="$root.eq(scope.row.creator, user.address) && (scope.row.status==='New' || scope.row.status==='Done')" tip="Remove task" icon="NA" title="Remove" @click="deleteTask(scope.row)" />
       </template>
     </el-table-column>
 

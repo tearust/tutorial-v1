@@ -85,7 +85,7 @@ new Vue({
       try{
         const json = JSON.parse(e.toString());
         
-        return this.$alert(json.human, title, {
+        return this.$alert(json.human || json.summary, title, {
           type: 'error',
           dangerouslyUseHTMLString: true,
         });
