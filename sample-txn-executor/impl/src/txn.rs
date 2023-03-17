@@ -7,10 +7,14 @@ use crate::{
 };
 use log::info;
 use prost::Message;
-use sample_txn_executor_codec::txn::Txns;
+use sample_txn_executor_codec::txn::{Status, Txns};
 use tea_sdk::{
     actor_txns::{context::TokenContext, Tsid, TxnSerial},
-    actors::{tokenstate::{SqlBeginTransactionRequest, NAME}, tappstore::txns::TappstoreTxn, tappstore::NAME as TAPPSTORE_NAME},
+    actors::{
+        tappstore::txns::TappstoreTxn,
+        tappstore::NAME as TAPPSTORE_NAME,
+        tokenstate::{SqlBeginTransactionRequest, NAME},
+    },
     actorx::{runtime::call, RegId},
     serialize,
     utils::wasm_actor::actors::statemachine::{query_state_tsid, CommitContext, CommitContextList},
@@ -52,6 +56,9 @@ pub(crate) async fn txn_exec(tsid: Tsid, txn: &Txns) -> Result<()> {
         }
         Txns::DeleteTask { subject, auth_b64 } => {
             let task = task_by_subject(subject).await?;
+            if task.status != Status::New && task.status != Status::Done {
+                return Err(TxnErrors::DeleteTaskFailed.into());
+            }
             check_account(auth_b64, task.creator).await?;
             let glue_ctx = new_gluedb_context().await?;
             delete_task(tsid, subject).await?;
@@ -70,6 +77,9 @@ pub(crate) async fn txn_exec(tsid: Tsid, txn: &Txns) -> Result<()> {
             auth_b64,
         } => {
             let task = task_by_subject(subject).await?;
+            if task.status != Status::WaitForVerification {
+                return Err(TxnErrors::VerifyTaskFailed.into());
+            }
             check_account(auth_b64, task.creator).await?;
             let glue_ctx = new_gluedb_context().await?;
             verify_task(tsid, subject, *failed).await?;
@@ -88,6 +98,9 @@ pub(crate) async fn txn_exec(tsid: Tsid, txn: &Txns) -> Result<()> {
             auth_b64,
         } => {
             let task = task_by_subject(subject).await?;
+            if task.status != Status::New {
+                return Err(TxnErrors::TakeTaskFailed.into());
+            }
             if let Some(worker) = task.worker {
                 return Err(TxnErrors::TaskInprogress(task.subject, worker).into());
             }
@@ -105,6 +118,9 @@ pub(crate) async fn txn_exec(tsid: Tsid, txn: &Txns) -> Result<()> {
         }
         Txns::CompleteTask { subject, auth_b64 } => {
             let task = task_by_subject(subject).await?;
+            if task.status != Status::InProgress {
+                return Err(TxnErrors::CompleteTaskFailed.into());
+            }
             check_account(auth_b64, task.worker.ok_or_err("task worker")?).await?;
             let glue_ctx = new_gluedb_context().await?;
             complete_task(tsid, subject).await?;
@@ -141,7 +157,7 @@ async fn new_gluedb_context() -> Result<Option<tokenstate::GluedbTransactionCont
 }
 
 pub async fn init_app_db() -> Result<()> {
-    let txn_bytes = tea_sdk::serialize(&Txns::Init{})?;
+    let txn_bytes = tea_sdk::serialize(&Txns::Init {})?;
     tea_sdk::utils::wasm_actor::actors::replica::send_transaction_locally_ex(
         &TxnSerial::new(
             "someone.sample_txn_executor".as_bytes().to_vec(),
