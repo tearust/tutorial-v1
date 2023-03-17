@@ -9,10 +9,8 @@ use log::info;
 use prost::Message;
 use sample_txn_executor_codec::txn::{Status, Txns};
 use tea_sdk::{
-    actor_txns::{context::TokenContext, Tsid, TxnSerial},
+    actor_txns::{context::TokenContext, Tsid},
     actors::{
-        tappstore::txns::TappstoreTxn,
-        tappstore::NAME as TAPPSTORE_NAME,
         tokenstate::{SqlBeginTransactionRequest, NAME},
     },
     actorx::{runtime::call, RegId},
