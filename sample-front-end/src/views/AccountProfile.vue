@@ -59,12 +59,12 @@
         
         <div class="x-bottom">
           
-          <el-button
+          <!-- <el-button
             type="primary"
             @click="faucet()"
           >
             Faucet TEA
-          </el-button>
+          </el-button> -->
 
         </div>
         
