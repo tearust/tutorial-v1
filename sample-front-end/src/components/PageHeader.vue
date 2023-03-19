@@ -40,7 +40,6 @@
   </div>
 
   <el-menu-item index="/account_profile">{{'Account'}}</el-menu-item>
-  <el-menu-item index="/admin">{{'Admin'}}</el-menu-item>
   <el-menu-item index="/task_main">{{'Task'}}</el-menu-item>
   <el-menu-item index="/welcome">{{'Help'}}</el-menu-item>
   

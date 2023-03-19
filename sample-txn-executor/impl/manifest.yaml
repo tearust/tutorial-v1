@@ -1,5 +1,5 @@
 actor_id: sample_txn_executor
-owner_id: someone
+owner_id: com.tea
 token_id: 0000000000000000000000000000000000000000
 access:
   - tea:adapter

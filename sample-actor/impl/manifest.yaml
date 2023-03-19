@@ -1,5 +1,5 @@
-actor_id: sample
-owner_id: someone
+actor_id: sample-actor
+owner_id: com.tea
 token_id: 0000000000000000000000000000000000000000
 access:
   - tea:adapter
