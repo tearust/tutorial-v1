@@ -1,3 +1,4 @@
 ./target
 ./sample-actor/target
 ./sample-front-end/node_modules
+./sample-txn-executor/target
