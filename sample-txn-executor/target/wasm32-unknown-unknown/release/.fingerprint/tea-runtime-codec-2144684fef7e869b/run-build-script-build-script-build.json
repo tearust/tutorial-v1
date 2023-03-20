@@ -1,1 +1,0 @@
-{"rustc":17004773524947412777,"features":"","target":0,"profile":0,"path":0,"deps":[[8870720442772621180,"build_script_build",false,13009784311522674613]],"local":[{"RerunIfChanged":{"output":"wasm32-unknown-unknown/release/build/tea-runtime-codec-2144684fef7e869b/output","paths":["proto"]}}],"rustflags":[],"metadata":0,"config":0,"compile_kind":0}
