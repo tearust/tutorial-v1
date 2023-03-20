@@ -1,0 +1,9 @@
+prefix=/Users/kevinzhang/github/tearust/tutorial-v1/sample-txn-executor/target/debug/build/openssl-sys-c104bb3b79612473/out/openssl-build/install
+exec_prefix=${prefix}
+libdir=${exec_prefix}/lib
+includedir=${prefix}/include
+
+Name: OpenSSL
+Description: Secure Sockets Layer and cryptography libraries and tools
+Version: 1.1.1t
+Requires: libssl libcrypto
