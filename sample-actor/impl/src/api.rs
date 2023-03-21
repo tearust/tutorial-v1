@@ -3,7 +3,10 @@ use std::str::FromStr;
 use tea_sdk::actors::tappstore::{txns::TappstoreTxn};
 use tea_sdk::utils::wasm_actor::actors::{
 	env::{tappstore_id},
+	tappstore::{SimpleDate, get_statements_async},
+	replica::IntelliSendMode,
 };
+use serde_json::json;
 use primitive_types::H160;
 use tea_sdk::tapp::{DOLLARS, Account, Balance, TokenId};
 use crate::types::*;
@@ -262,5 +265,67 @@ pub async fn init_token(payload: Vec<u8>, from_actor: String) -> Result<Vec<u8>>
 		vec![],
 	)
 	.await?;
+	help::result_ok()
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct JsonStatement {
+	pub account: String,
+	pub gross_amount: String,
+	pub statement_type: String,
+	pub token_id: String,
+	pub state_type: String,
+	pub memo: String,
+	pub time: String,
+}
+pub async fn query_op_logs(payload: Vec<u8>, _from_actor: String) -> Result<Vec<u8>> {
+	let req: QueryOpLogsRequest = serde_json::from_slice(&payload)?;
+	info!("query_op_logs... => {:?}", req);
+	let acct: Option<Account> = match &req.target {
+		Some(acct) => Some(acct.parse()?),
+		None => None,
+	};
+
+	let uuid = req.uuid.clone();
+
+	let date: Option<SimpleDate> = req
+		.year
+		.as_ref()
+		.map(|year| SimpleDate::new(*year, req.month.unwrap_or(1_u32), req.day.unwrap_or(1_u32)));
+
+	get_statements_async(
+		acct,
+		date,
+		IntelliSendMode::RemoteOnly,
+		move |statements, read_to_end| {
+			Box::pin(async move {
+				info!(
+					"read to end {}, get statements result: {:?}",
+					read_to_end, statements
+				);
+
+				let mut rows: Vec<JsonStatement> = Vec::new();
+				for item in statements {
+					let s = item.0;
+					let tmp = JsonStatement {
+						account: format!("{:?}", s.statement.account),
+						gross_amount: s.statement.gross_amount.to_string(),
+						statement_type: s.statement.statement_type.to_string(),
+						token_id: s.statement.token_id.to_hex(),
+						state_type: s.state_type.to_string(),
+						memo: item.2,
+						time: item.1,
+					};
+					rows.push(tmp);
+				}
+				info!("log rows => {:?}", rows);
+				let x = json!({ "logs": rows });
+				help::cache_json_with_uuid(&uuid, x).await?;
+				Ok(())
+			})
+		},
+	)
+	.await?;
+
 	help::result_ok()
 }

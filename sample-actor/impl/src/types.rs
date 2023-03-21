@@ -85,3 +85,13 @@ pub struct InitAppDBRequest {
   pub token_id: String, 
   pub uuid: String,
 }
+
+#[derive(Debug, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct QueryOpLogsRequest {
+	pub uuid: String,
+	pub target: Option<String>,
+	pub year: Option<i32>,
+	pub month: Option<u32>,
+	pub day: Option<u32>,
+}

@@ -11,7 +11,6 @@ const meta = {
   server_url: utils.get_env('LAYER2_URL'),
   mode: utils.get_env('mode') || 'app',
   server_actor: 'someone.sample',
-  
 };
 
 const _axios = axios.create({

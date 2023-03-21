@@ -56,6 +56,36 @@
           ></el-button>
         </div>
 
+        <div class="x-item">
+          <b>
+            {{ "Current TApp spending limit" }}
+            <TeaIconButton
+              style="position: relative"
+              place="right"
+              tip="
+            The limit on the total transaction value that can be sent through this TApp. This amount can be changed in the TApps tab of the TAppStore wallet.
+          "
+              icon="questionmark"
+            />
+          </b>
+          <span
+            style="margin-right: 34px"
+            :inner-html.prop="
+              tapp_allowance === null ? '...' : tapp_allowance | teaIcon
+            "
+          ></span>
+
+          <el-button
+            size="mini"
+            type="primary"
+            plain
+            icon="el-icon-refresh"
+            circle
+            @click="refreshTappDepositHandler($event)"
+            style="right: 0; position: absolute"
+          ></el-button>
+        </div>
+
         
         <div class="x-bottom">
           
@@ -89,6 +119,7 @@ export default {
   data() {
     return {
       tapp_balance: null,
+      tapp_allowance: null,
     };
   },
   computed: {
@@ -124,6 +155,7 @@ export default {
       flag && this.$root.loading(true);
       if(this.user && this.user.isLogin){
         await this.queryTokenBalance();
+        this.tapp_allowance = await layer2.user.query_current_allowance(this, true);
       }
       
       flag && this.$root.loading(false);

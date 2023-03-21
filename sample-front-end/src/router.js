@@ -6,6 +6,7 @@ import LoginPage from './views/LoginPage';
 import AccountProfile from './views/AccountProfile';
 import TaskMain from './views/TaskMain';
 import Admin from './views/Admin';
+import LogMain from './views/LogMain';
 
 Vue.use(Router);
 
@@ -45,6 +46,14 @@ let routers = [
     meta: {
       needLogin: true,
     }
+  },
+  {
+    path: '/log',
+    name: 'log',
+    component: LogMain,
+    meta: {
+      needLogin: true,
+    },
   },
   
   
