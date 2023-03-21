@@ -9,7 +9,7 @@ export const ChainMap = {
 
 
 export const ContractMap = {
-  'ERC20': '0x610178dA211FEF7D417bC0e6FeD39F05609AD788', 
+  'ERC20': '0x44809c2dA3f17C436D6c1f771784C35335f95242', 
   'LOCK': '0xFf675712BabA64dA7fF86e12105c9b35Fe7a48F6',
 };
 
