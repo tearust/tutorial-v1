@@ -50,7 +50,7 @@
       <!-- <el-button v-if="layer1_account.address" type="primary" @click="confirm()">Login</el-button> -->
 
       <p style="font-size: 16px; color: #f00;" v-if="!layer1_account.address">
-        Please select account from Polkadot extention.
+        Please select account from Metamask wallet.
       </p>
     </div>
     
