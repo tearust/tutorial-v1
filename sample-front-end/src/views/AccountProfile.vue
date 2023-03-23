@@ -96,6 +96,13 @@
             Faucet TEA
           </el-button>
 
+          <el-button
+            type="primary"
+            @click="setAllowance()"
+          >
+            Set spend limit
+          </el-button>
+
         </div>
         
       </div>
@@ -140,14 +147,12 @@ export default {
     await this.wf.init();
     await this.refreshAccount();
     this.$root.loading(false);
-
     utils.register(
       "refresh-current-account__account",
       async (key, param = {}) => {
         await this.refreshAccount();
       }
     );
-
   },
   methods: {
     
@@ -165,9 +170,13 @@ export default {
       await this.queryTokenBalance();
       this.$root.loading(false);
       e && e.target && e.target.blur();
-
     },
-
+    async refreshTappDepositHandler(e) {
+      this.$root.loading(true, "Refreshing TApp spend limit ...");
+      this.tapp_allowance = await layer2.user.query_current_allowance(this, true);
+      this.$root.loading(false);
+      e && e.target && e.target.blur();
+    },
     async queryTokenBalance() {
       try {
         this.tapp_balance = await layer2.user.query_balance(this);
@@ -175,7 +184,6 @@ export default {
         console.error(e);
       }
     },
-
     
     clickRefreshBtn() {
       utils.publish("refresh-current-account__account");
@@ -183,6 +191,13 @@ export default {
     
     async faucet(){
       await layer2.user.faucet(this, {}, async ()=>{
+        await this.refreshAccount();
+      });
+    },
+    async setAllowance(){
+      await layer2.tapp.setAllowance(this, {
+        name: 'Sample-actor',
+      }, async ()=>{
         await this.refreshAccount();
       });
     }

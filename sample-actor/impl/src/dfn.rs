@@ -13,6 +13,7 @@ pub fn name_list() -> Vec<&'static str> {
 		"init_db",
 		"init_token",
 		"queryOpLogs",
+		"setAllowance",
 	]
 }
 
@@ -29,6 +30,7 @@ pub async fn map_handler(action: &str, arg: Vec<u8>, from_actor: String) -> Resu
 		"init_db" => api::init_db(arg, from_actor).await?,
 		"init_token" => api::init_token(arg, from_actor).await?,
 		"queryOpLogs" => api::query_op_logs(arg, from_actor).await?,
+		"setAllowance" => api::set_allowance(arg, from_actor).await?,
 
 		_ => vec![],
 	};
