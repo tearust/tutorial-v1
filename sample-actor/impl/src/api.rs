@@ -264,3 +264,26 @@ pub async fn init_token(payload: Vec<u8>, from_actor: String) -> Result<Vec<u8>>
 	.await?;
 	help::result_ok()
 }
+
+pub async fn set_allowance(payload: Vec<u8>, from_actor: String) -> Result<Vec<u8>> {
+	let req: SetAllowanceRequest = serde_json::from_slice(&payload)?;
+	check_auth(&req.tapp_id_b64, &req.address, &req.auth_b64).await?;
+	info!("set allowance action... {:?}", req);
+
+	let txn = TappstoreTxn::SetAllowance {
+		address: req.address.parse()?,
+		token_id: TokenId::from_hex(&req.target_tapp_id_b64)?,
+		amount: Balance::from(u128::from_str(&req.amount)?),
+	};
+
+	request::send_tappstore_txn(
+		&from_actor,
+		"set_allowance",
+		&req.uuid,
+		tea_sdk::serialize(&req)?,
+		txn,
+		vec![],
+	)
+	.await?;
+	help::result_ok()
+}

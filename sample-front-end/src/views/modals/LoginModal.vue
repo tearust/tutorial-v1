@@ -84,7 +84,7 @@ export default {
       read: false,
       withdraw: false,
       consume: true,
-      move: false,
+      move: true,
       bonding_curve: false,
     };
   },
