@@ -247,8 +247,8 @@ const F = {
   async faucet(self, param = {}, succ_cb) {
     const session_key = F.checkLogin(self);
     try{
-      await self.$confirm('Are you sure to facuet your address 1000 TEA?', {
-        title: 'Faucet TEA',
+      await self.$confirm('Click OK to send 1000 TEA to your address', {
+        title: 'TEA Faucet',
         dangerouslyUseHTMLString: true,
       });
     }catch(e){
