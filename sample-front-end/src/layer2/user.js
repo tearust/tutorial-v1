@@ -7,6 +7,7 @@ import base from './base';
 import txn from './txn';
 import eth from '../eth';
 import common from './common';
+import mem from './mem';
 
 export const NOT_LOGIN = 'not_login';
 
@@ -406,7 +407,26 @@ const F = {
     return json;
   },
 
+  async query_current_allowance(self, no_cache=false){
+    const mem_key = 'user_queryAllowance';
+    const cache_result = mem.get(mem_key, 1*1000*60);
+    if(!_.isNull(cache_result) && !no_cache){
+      console.log('[User] queryAllowance cache result => ', cache_result);
+      return cache_result;
+    }
 
+    const opts = {
+      address: self.layer1_account.address,
+      tappIdB64: base.getTappId(),
+    };
+    const rs = await txn.query_request('query_allowance', opts);
+    const json = {
+      balance: utils.layer1.balanceToAmount(rs.balance),
+    };
+    console.log('allowance => ', json.balance);
+    mem.set(mem_key, json.balance);
+    return json.balance;
+  },
 
 
 
