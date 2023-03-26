@@ -1,6 +1,6 @@
 actor_id: sample-actor
 owner_id: com.tea
-token_id: 0000000000000000000000000000000000000000
+token_id: ae80ba96ab6e4c89a92e32807596288c2c9b557a
 access:
   - tea:adapter
   - tea:http
