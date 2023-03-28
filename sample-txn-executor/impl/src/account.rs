@@ -4,7 +4,7 @@ use tea_sdk::{
     actor_txns::{context::TokenContext, Tsid},
     serialize,
     tapp::{Account, Balance, TokenId, PUBLIC_RESERVED_ACCOUNT},
-    utils::wasm_actor::actors::{env::tappstore_id, tokenstate::cross_move},
+    utils::wasm_actor::actors::{env::tappstore_id, tokenstate::api_cross_move},
     OptionExt, ResultExt,
 };
 
@@ -16,7 +16,7 @@ pub(crate) async fn deposit_for_task(
     ctx: Vec<u8>,
 ) -> Result<(Vec<u8>, Vec<u8>)> {
     let tappstore_ctx = tappstore_ctx(tsid, base, Some(my_token_id())).await?;
-    cross_move(from, PUBLIC_RESERVED_ACCOUNT, amount, tappstore_ctx, ctx)
+    api_cross_move(from, PUBLIC_RESERVED_ACCOUNT, amount, tappstore_ctx, ctx)
         .await
         .err_into()
 }
@@ -28,7 +28,7 @@ pub(crate) async fn rollback_deposit(
     ctx: Vec<u8>,
 ) -> Result<(Vec<u8>, Vec<u8>)> {
     let tappstore_ctx = tappstore_ctx(tsid, base, None).await?;
-    cross_move(
+    api_cross_move(
         PUBLIC_RESERVED_ACCOUNT,
         task.creator,
         task.price,
@@ -48,7 +48,7 @@ pub(crate) async fn reward_owner(
     let deposit_sum = sum_task_deposit(&task.subject).await?;
     let tappstore_ctx = tappstore_ctx(tsid, base, None).await?;
     let worker = task.worker.ok_or_err("worker")?;
-    cross_move(
+    api_cross_move(
         PUBLIC_RESERVED_ACCOUNT,
         worker,
         deposit_sum,
