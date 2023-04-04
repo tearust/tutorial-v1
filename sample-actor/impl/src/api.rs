@@ -14,7 +14,7 @@ use sample_txn_executor_codec::{
 };
 
 const DAO_RESERVED_ACCOUNT: Account = H160([254u8; 20]);
-const TARGET_ACTOR: &'static [u8] = b"com.tea.sample-txn-executor";
+const TARGET_ACTOR: &'static [u8] = b"com.developer.sample-txn-executor";
 pub async fn txn_faucet(payload: Vec<u8>, from_actor: String) -> Result<Vec<u8>> {
 	let req: FaucetRequest = serde_json::from_slice(&payload)?;
   check_auth(&req.tapp_id_b64, &req.address, &req.auth_b64).await?;
@@ -233,7 +233,7 @@ pub async fn init_db(payload: Vec<u8>, from_actor: String) -> Result<Vec<u8>> {
 
 	request::send_custom_txn(
 		&from_actor,
-		"complete_task",
+		"init_db",
 		&req.uuid,
 		tea_sdk::serialize(&req)?,
 		tea_sdk::serialize(&txn)?,

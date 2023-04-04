@@ -48,7 +48,7 @@ impl Handle<(), Activate> for Actor {
         info!("activate sample txn executor actor successfully");
         register_adapter_http_dispatcher(vec!["query-tasks".to_string()]).await?;
 
-        info!("activate sample txn executor actor successfully");
+        info!("activate sample txn executor actor successfully.");
         Ok(())
     }
 }

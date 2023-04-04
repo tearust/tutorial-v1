@@ -49,7 +49,7 @@ impl Handle<(), Activate> for Actor {
     async fn handle(self, _: Activate, _: ()) -> Result<()> {
         let list = [&map_fn_list()[..], &crate::dfn::name_list()[..]].concat();
         register_adapter_http_dispatcher(list.iter().map(|v| v.to_string()).collect()).await?;
-        info!("activate sample actor successfully");
+        info!("activate tutorial-v1 actor successfully...");
         Ok(())
     }
 

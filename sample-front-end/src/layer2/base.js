@@ -10,7 +10,7 @@ const meta = {
   tapp_id: utils.get_env("TAPP_ID"),
   server_url: utils.get_env('LAYER2_URL'),
   mode: utils.get_env('mode') || 'app',
-  server_actor: 'com.tea.sample-actor',
+  server_actor: 'com.developer.sample-actor',
   
 };
 
