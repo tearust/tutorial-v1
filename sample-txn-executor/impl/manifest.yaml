@@ -1,6 +1,6 @@
 actor_id: sample-txn-executor
 owner_id: com.developer
-token_id: e4496413a6bdf07be0888ac4a8de3d3f43b7623b
+token_id: 50928af54eb311d05dc64b5629018583e33f4e11
 access:
   - tea:adapter
   - tea:statereceiver
