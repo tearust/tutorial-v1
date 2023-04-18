@@ -23,7 +23,7 @@
     "@polkadot/util": "10.1.9"
   },
   "devDependencies": {
-    "@open-wc/webpack-import-meta-loader": "0.4.7",
+    "@open-wc/webpack-import-meta-loader": "https://github.com/liyangwood/webpack-import-meta-loader-fixed.git",
     "@vue/cli-plugin-babel": "4.4.4",
     "@vue/cli-plugin-eslint": "4.4.4",
     "@vue/cli-service": "4.4.4",

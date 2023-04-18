@@ -2502,9 +2502,8 @@ checksum = "8ae9980cab1db3fceee2f6c6f643d5d8de2997c58ee8d25fb0cc8a9e9e7348e5"
 
 [[package]]
 name = "tea-actorx-core"
-version = "0.2.0-dev.18"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "04873b35b340f667cbe65e88e3a04fc529dd373bf4540fde1dd639f24d96925f"
+version = "0.2.0-dev.19"
+source = "git+https://github.com/tearust/sdk?branch=master#68a28911eae72b30e571c1f7b1de53fc4588ee92"
 dependencies = [
  "base64",
  "num-derive",
@@ -2517,9 +2516,8 @@ dependencies = [
 
 [[package]]
 name = "tea-actorx-host"
-version = "0.2.0-dev.18"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "cefe88faa491d29b533c3d5e08035c667ef3592605926c14d46403340fc49fd0"
+version = "0.2.0-dev.19"
+source = "git+https://github.com/tearust/sdk?branch=master#68a28911eae72b30e571c1f7b1de53fc4588ee92"
 dependencies = [
  "bincode",
  "crossbeam",
@@ -2540,9 +2538,8 @@ dependencies = [
 
 [[package]]
 name = "tea-actorx-macros"
-version = "0.2.0-dev.18"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "67db748e110ec9f6f3136885d913c1e5c0f089255585c7e87ce3a2d37a02b6b4"
+version = "0.2.0-dev.19"
+source = "git+https://github.com/tearust/sdk?branch=master#68a28911eae72b30e571c1f7b1de53fc4588ee92"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -2551,9 +2548,8 @@ dependencies = [
 
 [[package]]
 name = "tea-actorx-runtime"
-version = "0.2.0-dev.18"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "3ea26f47857e2b59c84aa0ab76775868bca990e4918a37e9e793e523545636d6"
+version = "0.2.0-dev.19"
+source = "git+https://github.com/tearust/sdk?branch=master#68a28911eae72b30e571c1f7b1de53fc4588ee92"
 dependencies = [
  "bincode",
  "lazy_static",
@@ -2568,9 +2564,8 @@ dependencies = [
 
 [[package]]
 name = "tea-actorx-signer"
-version = "0.2.0-dev.18"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "92fd7d6fbf600ee16cb7355b4a19c2b8ae920dd2c83c9c3f8a927b485673e339"
+version = "0.2.0-dev.19"
+source = "git+https://github.com/tearust/sdk?branch=master#68a28911eae72b30e571c1f7b1de53fc4588ee92"
 dependencies = [
  "base64",
  "bincode",
@@ -2590,9 +2585,8 @@ dependencies = [
 
 [[package]]
 name = "tea-actorx2"
-version = "0.2.0-dev.18"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "56b723f122ba9bee5905349a0e20d06051670de371d02e7f7e5b313e50690fb3"
+version = "0.2.0-dev.19"
+source = "git+https://github.com/tearust/sdk?branch=master#68a28911eae72b30e571c1f7b1de53fc4588ee92"
 dependencies = [
  "bincode",
  "futures",
@@ -2606,9 +2600,8 @@ dependencies = [
 
 [[package]]
 name = "tea-codec"
-version = "0.2.0-dev.18"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ba7ea7620b79721932393750365c04a9bc6f4878dd94fd65b36cadceef2f78bc"
+version = "0.2.0-dev.19"
+source = "git+https://github.com/tearust/sdk?branch=master#68a28911eae72b30e571c1f7b1de53fc4588ee92"
 dependencies = [
  "base64",
  "bincode",
@@ -2635,9 +2628,8 @@ dependencies = [
 
 [[package]]
 name = "tea-codec-macros"
-version = "0.2.0-dev.18"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "7d18c9a278f8f4e74e6b6feb7b2be5db5cd13891d31d04d215181be8d800f72c"
+version = "0.2.0-dev.19"
+source = "git+https://github.com/tearust/sdk?branch=master#68a28911eae72b30e571c1f7b1de53fc4588ee92"
 dependencies = [
  "convert_case",
  "itertools",
@@ -2648,9 +2640,8 @@ dependencies = [
 
 [[package]]
 name = "tea-runtime-codec"
-version = "0.2.0-dev.18"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "bcec9c4a3315a580b04fe385c4770a95bdc08ffe06d04f5b6202a004ea61606b"
+version = "0.2.0-dev.19"
+source = "git+https://github.com/tearust/sdk?branch=master#68a28911eae72b30e571c1f7b1de53fc4588ee92"
 dependencies = [
  "base64",
  "bincode",
@@ -2680,9 +2671,8 @@ dependencies = [
 
 [[package]]
 name = "tea-sdk"
-version = "0.2.0-dev.18"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "075056f8c1be976249944d42b8a8b8544ce6140697da2059359831579a5776e4"
+version = "0.2.0-dev.19"
+source = "git+https://github.com/tearust/sdk?branch=master#68a28911eae72b30e571c1f7b1de53fc4588ee92"
 dependencies = [
  "tea-actorx-core",
  "tea-actorx-macros",
@@ -2697,9 +2687,8 @@ dependencies = [
 
 [[package]]
 name = "tea-system-actors"
-version = "0.2.0-dev.18"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "543b81d17148058f06d33d7bde258a7351c8bbdcaebe35d31540949ba5504e10"
+version = "0.2.0-dev.19"
+source = "git+https://github.com/tearust/sdk?branch=master#68a28911eae72b30e571c1f7b1de53fc4588ee92"
 dependencies = [
  "serde",
  "strum",
@@ -2710,9 +2699,8 @@ dependencies = [
 
 [[package]]
 name = "tea-wasm-actor-utils"
-version = "0.2.0-dev.18"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "36b0e24a70a52229e7b1213e2c8e31b217c8bf4315609dc7ac12cf816cee4a83"
+version = "0.2.0-dev.19"
+source = "git+https://github.com/tearust/sdk?branch=master#68a28911eae72b30e571c1f7b1de53fc4588ee92"
 dependencies = [
  "base64",
  "bytes",
