@@ -89,12 +89,23 @@
         
         <div class="x-bottom">
           
-          <!-- <el-button
+          <div class="x-bottom">
+          
+          <el-button
             type="primary"
             @click="faucet()"
           >
             Faucet TEA
-          </el-button> -->
+          </el-button>
+
+          <el-button
+            type="primary"
+            @click="setAllowance()"
+          >
+            Set spend limit
+          </el-button>
+
+        </div>
 
         </div>
         
@@ -187,6 +198,13 @@ export default {
     
     async faucet(){
       await layer2.user.faucet(this, {}, async ()=>{
+        await this.refreshAccount();
+      });
+    },
+    async setAllowance(){
+      await layer2.tapp.setAllowance(this, {
+        name: 'Sample-actor',
+      }, async ()=>{
         await this.refreshAccount();
       });
     }

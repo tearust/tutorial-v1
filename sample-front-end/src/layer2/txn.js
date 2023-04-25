@@ -100,7 +100,6 @@ const F = {
           address: param.address,
         });
 
-        if(!step_4_rs.status) throw step_4_rs.error;
       }catch(e){
         console.log("step4 error: ", e);
 

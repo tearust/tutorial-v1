@@ -13,6 +13,7 @@ pub fn name_list() -> Vec<&'static str> {
 		"init_db",
 		"init_token",
 		"queryOpLogs",
+		"setAllowance",
 	]
 }
 
@@ -23,12 +24,22 @@ pub async fn map_handler(action: &str, arg: Vec<u8>, from_actor: String) -> Resu
 		"create_task" => api::create_task(arg, from_actor).await?,
 		"query_task_list" => api::query_task_list(arg, from_actor).await?,
 		"delete_task" => api::delete_task(arg, from_actor).await?,
-		"verify_task" => api::verify_task(arg, from_actor).await?,
+		// "verify_task" => api::verify_task(arg, from_actor).await?,
 		"take_task" => api::take_task(arg, from_actor).await?,
 		"complete_task" => api::complete_task(arg, from_actor).await?,
 		"init_db" => api::init_db(arg, from_actor).await?,
 		"init_token" => api::init_token(arg, from_actor).await?,
 		"queryOpLogs" => api::query_op_logs(arg, from_actor).await?,
+		"setAllowance" => api::set_allowance(arg, from_actor).await?,
+
+		_ => vec![],
+	};
+	Ok(res)
+}
+
+pub async fn map_cb_handler(action: &str, arg: Vec<u8>, from_actor: String) -> Result<Vec<u8>> {
+	let res = match action {
+		"complete_task" => api::complete_task_cb(arg, from_actor).await?,
 
 		_ => vec![],
 	};

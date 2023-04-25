@@ -14,7 +14,7 @@ use tea_sdk::{
     },
     Handle, ResultExt,
 };
-use tea_sdk::utils::client_wasm_actor::types::{map_handler, HttpRequest};
+use tea_sdk::utils::client_wasm_actor::types::{map_handler, HttpRequest, ClientTxnCbRequest, map_cb_handler};
 use tea_sdk::actors::libp2p::Libp2pReply;
 
 use ::{log::info, tea_sdk::utils::wasm_actor::actors::adapter::register_adapter_http_dispatcher};
@@ -29,6 +29,7 @@ pub mod error;
 mod types;
 mod dfn;
 mod api;
+mod oracle;
 
 actor!(Actor);
 
@@ -41,7 +42,8 @@ impl Handles<()> for Actor {
         PreInvoke,
         HttpRequest,
         GreetingsRequest,
-        Libp2pReply
+        Libp2pReply,
+        ClientTxnCbRequest
     ];
 }
 
@@ -65,9 +67,21 @@ impl Handle<(), PreInvoke> for Actor {
 
 impl Handle<(), HttpRequest> for Actor {
 	async fn handle(self, req: HttpRequest, _: ()) -> Result<Vec<u8>> {
-		let from_actor = "sample_actor".to_string();
+		let from_actor = "com.developer.sample-actor".to_string();
 		let base_res = map_handler(&req.action, req.clone().payload, from_actor.clone()).await?;
 		let cur_res = crate::dfn::map_handler(&req.action, req.payload, from_actor).await?;
+		if cur_res.is_empty() && !base_res.is_empty() {
+			return Ok(base_res);
+		}
+		Ok(cur_res)
+	}
+}
+
+impl Handle<(), ClientTxnCbRequest> for Actor {
+	async fn handle(self, req: ClientTxnCbRequest, _: ()) -> Result<Vec<u8>> {
+		let from_actor = req.clone().from_actor;
+		let base_res = map_cb_handler(&req.action, req.clone().payload, from_actor.clone()).await?;
+        let cur_res = crate::dfn::map_cb_handler(&req.action, req.payload, from_actor).await?;
 		if cur_res.is_empty() && !base_res.is_empty() {
 			return Ok(base_res);
 		}

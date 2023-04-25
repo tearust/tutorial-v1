@@ -55,7 +55,7 @@ const F = {
           subject: {
             type: 'Input',
             required: true,
-            label: 'Task subject',
+            label: 'Twitter ID',
           },
           price: {
             type: 'number',
@@ -156,31 +156,45 @@ const F = {
   },
   async completeTask(self, param, succ_cb){
     const session_key = user.checkLogin(self);
-    try{
-      await self.$confirm('Are you sure to complete the task?', {
-        title: 'Complete task',
-        dangerouslyUseHTMLString: true,
-      });
-    }catch(e){
-      return;
-    }
 
-    const opts = {
-      address: self.layer1_account.address,
-      tappIdB64: base.getTappId(),
-      authB64: session_key,
-      subject: param.subject,
-    };
+    self.$store.commit('modal/open', {
+      key: 'common_form',
+      param: {
+        title: 'Complete Task',
+        text: `Please input your answer and complete the task.`,
+        props: {
+          text: {
+            type: 'Input',
+            required: true,
+            label: 'Answer',
+          },
 
-    try {
-      await txn.txn_request('complete_task', opts);
-      self.$root.success();
-      await succ_cb();
-    } catch (e) {
-      console.error(e);
-      self.$root.showError(e.toString());
-    }
-    self.$root.loading(false);
+        },
+      },
+      cb: async (form, close) => {
+        self.$root.loading(true);
+
+        const opts = {
+          address: self.layer1_account.address,
+          tappIdB64: base.getTappId(),
+          authB64: session_key,
+          subject: param.subject,
+          text: form.text,
+        };
+
+        try {
+          await txn.txn_request('complete_task', opts);
+          self.$root.success();
+          await succ_cb();
+        } catch (e) {
+          console.error(e);
+          self.$root.showError(e.toString());
+        }
+        close();
+        self.$root.loading(false);
+
+      }
+    });
   },
   async verifyTask(self, param, succ_cb){
     const session_key = user.checkLogin(self);

@@ -102,13 +102,13 @@ pub(crate) async fn txn_exec(tsid: Tsid, txn: &Txns) -> Result<()> {
         Txns::VerifyTask {
             subject,
             failed,
-            auth_b64,
+            auth_b64: _,
         } => {
             let task = task_by_subject(subject).await?;
             if task.status != Status::WaitForVerification {
                 return Err(TxnErrors::VerifyTaskFailed.into());
             }
-            check_account(auth_b64, task.creator).await?;
+            // check_account(auth_b64, task.creator).await?;
             let glue_ctx = new_gluedb_context().await?;
 
             verify_task(tsid, subject, *failed).await?;
@@ -137,7 +137,8 @@ pub(crate) async fn txn_exec(tsid: Tsid, txn: &Txns) -> Result<()> {
                         glue_ctx,
                         None,
                         None,
-                        decode_auth_key(auth_b64)?,
+                        RECEIPTING_AUTH_KEY,
+                        // decode_auth_key(auth_b64)?,
                         txn.to_string(),
                     )],
                     ..Default::default()

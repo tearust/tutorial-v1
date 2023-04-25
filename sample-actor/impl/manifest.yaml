@@ -12,5 +12,6 @@ access:
   - com.tea.keyvalue-actor.manager
   - com.tea.replica-service-actor
   - com.tea.tappstore-actor
+  - com.tea.client-actor
   - tea:crypto
   - tea:orbitdb

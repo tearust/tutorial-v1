@@ -54,8 +54,8 @@
         <TeaIconButton v-if="!$root.eq(scope.row.creator, user.address) && scope.row.status==='New'" tip="Take task" icon="NA" title="Take" @click="takeTask(scope.row)" />
         <TeaIconButton v-if="$root.eq(scope.row.worker, user.address) && scope.row.status==='InProgress'" tip="Take task" icon="NA" title="Complete" @click="completeTask(scope.row)" />
 
-        <TeaIconButton v-if="$root.eq(scope.row.creator, user.address) && scope.row.status==='WaitForVerification'" tip="Verify success" icon="NA" title="Confirm" @click="verifyTask(scope.row, true)" />
-        <TeaIconButton v-if="$root.eq(scope.row.creator, user.address) && scope.row.status==='WaitForVerification'" tip="Verify failed" icon="NA" title="Reject" @click="verifyTask(scope.row, false)" />
+        <!-- <TeaIconButton v-if="$root.eq(scope.row.creator, user.address) && scope.row.status==='WaitForVerification'" tip="Verify success" icon="NA" title="Confirm" @click="verifyTask(scope.row, true)" />
+        <TeaIconButton v-if="$root.eq(scope.row.creator, user.address) && scope.row.status==='WaitForVerification'" tip="Verify failed" icon="NA" title="Reject" @click="verifyTask(scope.row, false)" /> -->
 
 
         <TeaIconButton v-if="$root.eq(scope.row.creator, user.address) && (scope.row.status==='New' || scope.row.status==='Done')" tip="Remove task" icon="NA" title="Remove" @click="deleteTask(scope.row)" />
@@ -140,6 +140,7 @@ export default {
       try{
         await layer2.task.completeTask(this, row, async (rs)=>{
           this.$root.success("Complete task success");
+          await utils.sleep(8000);
           await this.refreshList();
         });
       }catch(e){
@@ -156,16 +157,16 @@ export default {
         this.$root.showError(e);
       }
     },
-    async verifyTask(row, ok){
-      try{
-        await layer2.task.verifyTask(this, {...row, ok}, async (rs)=>{
-          this.$root.success("Verify task success");
-          await this.refreshList();
-        });
-      }catch(e){
-        this.$root.showError(e);
-      }
-    }
+    // async verifyTask(row, ok){
+    //   try{
+    //     await layer2.task.verifyTask(this, {...row, ok}, async (rs)=>{
+    //       this.$root.success("Verify task success");
+    //       await this.refreshList();
+    //     });
+    //   }catch(e){
+    //     this.$root.showError(e);
+    //   }
+    // }
     
   }
 };
