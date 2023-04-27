@@ -24,7 +24,7 @@ export default {
         actor: 'someone.sample',
         address: '0x000000000000000000000000000000000000000f'
       });
-      alert(JSON.stringify(rs));
+      alert(rs.data);
     }
   }
 };
