@@ -18,5 +18,4 @@ serde = { workspace = true }
 serde_derive = { workspace = true }
 
 [dev-dependencies]
-tea-sdk = { workspace = true, features = ["mock"] }
 tokio = { workspace = true, features = ["full"] }
