@@ -1,4 +1,4 @@
-actor_id: sample_txn_executor
+actor_id: sample-txn-executor
 owner_id: someone
 token_id: 0000000000000000000000000000000000000000
 access:

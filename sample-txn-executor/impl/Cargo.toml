@@ -16,5 +16,4 @@ base64 = { workspace = true }
 prost = { workspace = true }
 
 [dev-dependencies]
-tea-sdk = { workspace = true, features = ["mock"] }
 tokio = { workspace = true, features = ["full"] }
