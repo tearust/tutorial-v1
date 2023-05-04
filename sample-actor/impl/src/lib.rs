@@ -4,10 +4,11 @@
 
 use crate::error::GreetingNameEmpty;
 use error::{HttpActionNotSupported, Result};
-use sample_actor_codec::{AddRequest, AddResponse, GreetingsRequest};
+use sample_actor_codec::{AddRequest, AddResponse, GreetingsRequest, NAME};
 use tea_sdk::{
     actors::adapter::HttpRequest,
-    actorx::runtime::{actor, println, Activate, PreInvoke},
+    actorx::hooks::{Activate},
+    actorx::{actor, ActorId, HandlerActor},
     serde::handle::{Handle, Handles},
     utils::wasm_actor::logging::set_logging,
     Handle, ResultExt,
@@ -25,18 +26,28 @@ actor!(Actor);
 #[derive(Default, Clone)]
 pub struct Actor;
 
-impl Handles<()> for Actor {
+impl Handles for Actor {
     type List = Handle![
         Activate,
-        PreInvoke,
         HttpRequest,
         GreetingsRequest,
         AddRequest
     ];
 }
 
-impl Handle<(), Activate> for Actor {
-    async fn handle(self, _: Activate, _: ()) -> Result<()> {
+impl HandlerActor for Actor {
+	fn id(&self) -> Option<ActorId> {
+		Some(NAME.into())
+	}
+
+	async fn pre_handle<'a>(&'a self, req: &'a [u8]) -> Result<std::borrow::Cow<'a, [u8]>> {
+		set_logging(false, false);
+		Ok(std::borrow::Cow::Borrowed(req))
+	}
+}
+
+impl Handle<Activate> for Actor {
+    async fn handle(&self, _: Activate) -> Result<()> {
         #[cfg(not(test))]
         {
             register_adapter_http_dispatcher(vec!["say-hello".to_string()]).await?;
@@ -46,15 +57,10 @@ impl Handle<(), Activate> for Actor {
     }
 }
 
-impl Handle<(), PreInvoke> for Actor {
-    async fn handle(self, _: PreInvoke, _: ()) -> Result<()> {
-        set_logging(false, false);
-        Ok(())
-    }
-}
 
-impl Handle<(), HttpRequest> for Actor {
-    async fn handle(self, HttpRequest { action, .. }: HttpRequest, _: ()) -> Result<Vec<u8>> {
+impl Handle<HttpRequest> for Actor {
+    async fn handle(&self, HttpRequest { action, .. }: HttpRequest) -> Result<Vec<u8>> {
+        log::info!("@@ aa => {:?}", action);
         match action.as_str() {
             "say-hello" => serde_json::to_vec("Hello world!").err_into(),
             _ => Err(HttpActionNotSupported(action).into()),
@@ -62,8 +68,8 @@ impl Handle<(), HttpRequest> for Actor {
     }
 }
 
-impl Handle<(), GreetingsRequest> for Actor {
-    async fn handle(self, GreetingsRequest(name): GreetingsRequest, _: ()) -> Result<()> {
+impl Handle<GreetingsRequest> for Actor {
+    async fn handle(&self, GreetingsRequest(name): GreetingsRequest) -> Result<()> {
         if name.is_empty() {
             return Err(GreetingNameEmpty.into());
         }
@@ -73,8 +79,8 @@ impl Handle<(), GreetingsRequest> for Actor {
     }
 }
 
-impl Handle<(), AddRequest> for Actor {
-    async fn handle(self, AddRequest(lhs, rhs): AddRequest, _: ()) -> Result<AddResponse> {
+impl Handle<AddRequest> for Actor {
+    async fn handle(&self, AddRequest(lhs, rhs): AddRequest) -> Result<AddResponse> {
         Ok(AddResponse(lhs + rhs))
     }
 }
