@@ -5,13 +5,14 @@
 use error::{HttpActionNotSupported, Result};
 use log::{error, info};
 use sample_txn_executor_codec::{
+    NAME,
     txn::{Task, Txns},
     *,
 };
 use sql::query_all_tasks;
 use tea_sdk::{
     actors::{adapter::HttpRequest, replica::ExecTxnCast, state_receiver::ActorTxnCheckMessage},
-    actorx::runtime::{actor, Activate, PreInvoke},
+    actorx::{actor, ActorId, hooks::Activate, HandlerActor},
     deserialize,
     serde::handle::{Handle, Handles},
     utils::wasm_actor::{
@@ -32,10 +33,9 @@ actor!(Actor);
 #[derive(Default, Clone)]
 pub struct Actor;
 
-impl Handles<()> for Actor {
+impl Handles for Actor {
     type List = Handle![
         Activate,
-        PreInvoke,
         HttpRequest,
         TaskQueryRequest,
         ExecTxnCast,
@@ -43,8 +43,19 @@ impl Handles<()> for Actor {
     ];
 }
 
-impl Handle<(), Activate> for Actor {
-    async fn handle(self, _: Activate, _: ()) -> Result<()> {
+impl HandlerActor for Actor {
+	fn id(&self) -> Option<ActorId> {
+		Some(NAME.into())
+	}
+
+	async fn pre_handle<'a>(&'a self, req: &'a [u8]) -> Result<std::borrow::Cow<'a, [u8]>> {
+		set_logging(false, false);
+		Ok(std::borrow::Cow::Borrowed(req))
+	}
+}
+
+impl Handle<Activate> for Actor {
+    async fn handle(&self, _: Activate) -> Result<()> {
         info!("activate sample txn executor actor successfully");
         register_adapter_http_dispatcher(vec!["query-tasks".to_string()]).await?;
 
@@ -53,15 +64,8 @@ impl Handle<(), Activate> for Actor {
     }
 }
 
-impl Handle<(), PreInvoke> for Actor {
-    async fn handle(self, _: PreInvoke, _: ()) -> Result<()> {
-        set_logging(false, false);
-        Ok(())
-    }
-}
-
-impl Handle<(), HttpRequest> for Actor {
-    async fn handle(self, HttpRequest { action, payload }: HttpRequest, _: ()) -> Result<Vec<u8>> {
+impl Handle<HttpRequest> for Actor {
+    async fn handle(&self, HttpRequest { action, payload }: HttpRequest) -> Result<Vec<u8>> {
         match action.as_str() {
             "query-tasks" => {
                 let query: TaskQueryRequest = serde_json::from_slice(&payload)?;
@@ -73,14 +77,14 @@ impl Handle<(), HttpRequest> for Actor {
     }
 }
 
-impl Handle<(), TaskQueryRequest> for Actor {
-    async fn handle(self, req: TaskQueryRequest, _: ()) -> Result<TaskQueryResponse> {
+impl Handle<TaskQueryRequest> for Actor {
+    async fn handle(&self, req: TaskQueryRequest) -> Result<TaskQueryResponse> {
         Ok(TaskQueryResponse(query_tasks_by_filter(req).await?))
     }
 }
 
-impl Handle<(), ExecTxnCast> for Actor {
-    async fn handle(self, ExecTxnCast(tsid, txn_bytes, _args): ExecTxnCast, _: ()) -> Result<()> {
+impl Handle<ExecTxnCast> for Actor {
+    async fn handle(&self, ExecTxnCast(tsid, txn_bytes, _args): ExecTxnCast) -> Result<()> {
         let txn: Txns = deserialize(txn_bytes)?;
         if let Err(e) = txn::txn_exec(tsid, &txn).await {
             error!("exec txn error: {}", e);
@@ -90,8 +94,8 @@ impl Handle<(), ExecTxnCast> for Actor {
     }
 }
 
-impl Handle<(), ActorTxnCheckMessage> for Actor {
-    async fn handle(self, req: ActorTxnCheckMessage, _: ()) -> Result<()> {
+impl Handle<ActorTxnCheckMessage> for Actor {
+    async fn handle(&self, req: ActorTxnCheckMessage) -> Result<()> {
         let _txn: Txns = deserialize(req.txn_bytes.as_slice())?;
         // all transaction types are allowed to send from b nodes,
         //  so there is no additional check.

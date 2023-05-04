@@ -1,7 +1,7 @@
-use tea_sdk::{actorx::runtime::error::Runtime, define_scope};
+use tea_sdk::{actorx::error::ActorX, define_scope};
 
 define_scope! {
-    SampleActor: Runtime {
+    SampleActor: ActorX {
         HttpActionNotSupported;
         GreetingNameEmpty;
     }

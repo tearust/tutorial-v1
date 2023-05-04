@@ -12,12 +12,13 @@ use tea_sdk::tapp::{DOLLARS, Account, Balance, TokenId};
 use crate::types::*;
 use tea_sdk::utils::client_wasm_actor::{help, check_auth, request, Result};
 use sample_txn_executor_codec::{
+	NAME,
 	TaskQueryRequest,
 	txn::{Task, Status, Txns}
 };
 
 const DAO_RESERVED_ACCOUNT: Account = H160([254u8; 20]);
-const TARGET_ACTOR: &'static [u8] = b"someone.sample_txn_executor";
+const TARGET_ACTOR: &'static [u8] = NAME;
 pub async fn txn_faucet(payload: Vec<u8>, from_actor: String) -> Result<Vec<u8>> {
 	let req: FaucetRequest = serde_json::from_slice(&payload)?;
   check_auth(&req.tapp_id_b64, &req.address, &req.auth_b64).await?;
@@ -81,7 +82,7 @@ pub async fn query_task_list(payload: Vec<u8>, from_actor: String) -> Result<Vec
 
 	let uuid: String = req.uuid.to_string();
 
-	request::send_custom_query(
+	let res = request::send_custom_query(
 		&from_actor,
 		TaskQueryRequest {
 			creator: None,
@@ -90,19 +91,15 @@ pub async fn query_task_list(payload: Vec<u8>, from_actor: String) -> Result<Vec
 			subject: None,
 		},
 		TARGET_ACTOR,
-		move |res| {
-			Box::pin(async move {
-				let r: Vec<Task>  = res.0;
-				let x = serde_json::json!({
-					"list": format_task(r)?,
-				});
-				info!("query_task_list => {:?}", x);
-				help::cache_json_with_uuid(&uuid, x).await?;
-				Ok(())
-			})
-		},
 	)
 	.await?;
+
+	let r: Vec<Task>  = res.0;
+	let x = serde_json::json!({
+		"list": format_task(r)?,
+	});
+	info!("query_task_list => {:?}", x);
+	help::cache_json_with_uuid(&uuid, x).await?;
 
 	help::result_ok()
 }
@@ -293,39 +290,35 @@ pub async fn query_op_logs(payload: Vec<u8>, _from_actor: String) -> Result<Vec<
 		.as_ref()
 		.map(|year| SimpleDate::new(*year, req.month.unwrap_or(1_u32), req.day.unwrap_or(1_u32)));
 
-	get_statements_async(
+	let (statements, read_to_end) = get_statements_async(
 		acct,
 		date,
 		IntelliSendMode::RemoteOnly,
-		move |statements, read_to_end| {
-			Box::pin(async move {
-				info!(
-					"read to end {}, get statements result: {:?}",
-					read_to_end, statements
-				);
-
-				let mut rows: Vec<JsonStatement> = Vec::new();
-				for item in statements {
-					let s = item.0;
-					let tmp = JsonStatement {
-						account: format!("{:?}", s.statement.account),
-						gross_amount: s.statement.gross_amount.to_string(),
-						statement_type: s.statement.statement_type.to_string(),
-						token_id: s.statement.token_id.to_hex(),
-						state_type: s.state_type.to_string(),
-						memo: item.2,
-						time: item.1,
-					};
-					rows.push(tmp);
-				}
-				info!("log rows => {:?}", rows);
-				let x = json!({ "logs": rows });
-				help::cache_json_with_uuid(&uuid, x).await?;
-				Ok(())
-			})
-		},
 	)
 	.await?;
+
+	info!(
+		"read to end {}, get statements result: {:?}",
+		read_to_end, statements
+	);
+
+	let mut rows: Vec<JsonStatement> = Vec::new();
+	for item in statements {
+		let s = item.0;
+		let tmp = JsonStatement {
+			account: format!("{:?}", s.statement.account),
+			gross_amount: s.statement.gross_amount.to_string(),
+			statement_type: s.statement.statement_type.to_string(),
+			token_id: s.statement.token_id.to_hex(),
+			state_type: s.state_type.to_string(),
+			memo: item.2,
+			time: item.1,
+		};
+		rows.push(tmp);
+	}
+	info!("log rows => {:?}", rows);
+	let x = json!({ "logs": rows });
+	help::cache_json_with_uuid(&uuid, x).await?;
 
 	help::result_ok()
 }
