@@ -4,7 +4,7 @@ use sample_txn_executor_codec::txn::*;
 use tea_sdk::{
     actor_txns::Tsid,
     actors::tokenstate::{ExecGlueCmdRequest, InitGlueSqlRequest, NAME},
-    actorx::{runtime::call, RegId},
+    actorx::{ActorId},
     serialize,
     tapp::Account,
     utils::wasm_actor::{
@@ -99,8 +99,7 @@ pub(crate) async fn sql_init(tsid: Tsid) -> Result<()> {
         token_id: serialize(&my_token_id())?,
         tsid: serialize(&tsid)?,
     };
-    call(
-        RegId::Static(NAME).inst(0),
+    ActorId::Static(NAME).call(
         InitGlueSqlRequest(encode_protobuf(req)?),
     )
     .await?;
@@ -115,8 +114,7 @@ async fn exec_sql(tsid: Tsid, sql: String) -> Result<()> {
         sql,
         tsid: serialize(&tsid)?,
     };
-    call(
-        RegId::Static(NAME).inst(0),
+    ActorId::Static(NAME).call(
         ExecGlueCmdRequest(encode_protobuf(req)?),
     )
     .await?;

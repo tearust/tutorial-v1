@@ -13,7 +13,7 @@ use tea_sdk::{
     actors::{
         tokenstate::{SqlBeginTransactionRequest, NAME},
     },
-    actorx::{runtime::call, RegId},
+    actorx::ActorId,
     serialize,
     utils::wasm_actor::actors::statemachine::{query_state_tsid, CommitContext, CommitContextList},
     vmh::message::{encode_protobuf, structs_proto::tokenstate},
@@ -141,8 +141,7 @@ pub(crate) async fn txn_exec(tsid: Tsid, txn: &Txns) -> Result<()> {
 }
 
 async fn new_gluedb_context() -> Result<Option<tokenstate::GluedbTransactionContext>> {
-    let buf = call(
-        RegId::Static(NAME).inst(0),
+    let buf = ActorId::Static(NAME).call(
         SqlBeginTransactionRequest(encode_protobuf(tokenstate::BeginTransactionRequest {
             token_id: serialize(&my_token_id())?,
         })?),
