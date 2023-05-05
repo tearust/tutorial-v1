@@ -77,34 +77,6 @@ pub async fn create_task(payload: Vec<u8>, from_actor: String) -> Result<Vec<u8>
 	help::result_ok()
 }
 
-// pub async fn query_task_list(payload: Vec<u8>, from_actor: String) -> Result<Vec<u8>> {
-// 	let req: QueryTaskRequest = serde_json::from_slice(&payload)?;
-// 	info!("Start query_task_list...");
-
-// 	let uuid: String = req.uuid.to_string();
-
-// 	let res = request::send_custom_query(
-// 		&from_actor,
-// 		TaskQueryRequest {
-// 			creator: None,
-// 			worker: None,
-// 			status: None,
-// 			subject: None,
-// 		},
-// 		TARGET_ACTOR,
-// 	)
-// 	.await?;
-
-// 	let r: Vec<Task>  = res.0;
-// 	let x = serde_json::json!({
-// 		"list": format_task(r)?,
-// 	});
-// 	info!("query_task_list => {:?}", x);
-// 	help::cache_json_with_uuid(&uuid, x).await?;
-
-// 	help::result_ok()
-// }
-
 pub async fn query_task_list(payload: Vec<u8>, from_actor: String) -> Result<Vec<u8>> {
 	let req: QueryTaskRequest = serde_json::from_slice(&payload)?;
 	info!("Start query_task_list...");
