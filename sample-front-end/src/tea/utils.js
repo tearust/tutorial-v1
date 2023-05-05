@@ -269,6 +269,9 @@ const F = {
     const x_key = 'VUE_APP_' + _.toUpper(key);
     return _.get(process.env, x_key, null);
   },
+  is_dev(){
+    return process.env.NODE_ENV === 'dev';
+  },
 
 
   register: (key, cb) => {

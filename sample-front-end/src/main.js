@@ -46,8 +46,8 @@ new Vue({
   router,
   store,
   methods: {
-    isDev() {
-      return true;
+    is_dev() {
+      return utils.is_dev();
     },
     loading(f, text = 'Loading...') {
       if (f) {

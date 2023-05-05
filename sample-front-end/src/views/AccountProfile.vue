@@ -87,9 +87,8 @@
         </div>
 
         
-        <div class="x-bottom">
+        <div class="x-bottom" v-if="$root.is_dev()">
           
-          <div class="x-bottom">
           
           <el-button
             type="primary"
@@ -105,7 +104,6 @@
             Set spend limit
           </el-button>
 
-        </div>
 
         </div>
         
