@@ -5,6 +5,8 @@ use tea_sdk::serde::TypeId;
 
 pub mod error;
 
+pub const NAME: &[u8] = b"com.developer.sample-actor";
+
 #[derive(Debug, Clone, Serialize, Deserialize, TypeId)]
 #[response(())]
 pub struct GreetingsRequest(pub String);

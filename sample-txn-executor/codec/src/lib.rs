@@ -6,6 +6,8 @@ use tea_sdk::{serde::TypeId, tapp::Account};
 pub mod error;
 pub mod txn;
 
+pub const NAME: &[u8] = b"com.developer.sample-txn-executor";
+
 #[derive(Debug, Clone, Serialize, Deserialize, TypeId)]
 pub struct TaskQueryRequest {
     pub creator: Option<Account>,
@@ -15,3 +17,5 @@ pub struct TaskQueryRequest {
 }
 #[derive(Debug, Clone, Serialize, Deserialize, TypeId)]
 pub struct TaskQueryResponse(pub Vec<txn::Task>);
+
+

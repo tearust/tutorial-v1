@@ -13,7 +13,7 @@ use sample_txn_executor_codec::txn::{Status, Txns};
 use tea_sdk::{
     actor_txns::{context::TokenContext, Tsid},
     actors::tokenstate::{SqlBeginTransactionRequest, NAME},
-    actorx::{runtime::call, RegId},
+    actorx::ActorId,
     serialize,
     tapp::RECEIPTING_AUTH_KEY,
     utils::wasm_actor::actors::statemachine::{query_state_tsid, CommitContext, CommitContextList},
@@ -207,8 +207,7 @@ pub(crate) async fn txn_exec(tsid: Tsid, txn: &Txns) -> Result<()> {
 }
 
 async fn new_gluedb_context() -> Result<Option<tokenstate::GluedbTransactionContext>> {
-    let buf = call(
-        RegId::Static(NAME).inst(0),
+    let buf = ActorId::Static(NAME).call(
         SqlBeginTransactionRequest(encode_protobuf(tokenstate::BeginTransactionRequest {
             token_id: serialize(&my_token_id().await?)?,
         })?),

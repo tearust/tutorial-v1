@@ -2,7 +2,7 @@ use crate::error::{Result, TxnErrors};
 use base64::{engine::general_purpose, Engine};
 use tea_sdk::{
     actors::tokenstate::{QueryUserLoginSessionKeyRequest, QueryUserLoginSessionKeyResponse},
-    actorx::{runtime::call, RegId},
+    actorx::ActorId,
     utils::wasm_actor::actors::env::get_current_wasm_actor_token_id,
     deserialize,
     tapp::{Account, AuthKey, TokenId},
@@ -18,8 +18,7 @@ pub async fn my_token_id() -> Result<TokenId> {
 }
 
 pub async fn check_account(auth_b64: &str, account: Account) -> Result<()> {
-    let QueryUserLoginSessionKeyResponse(expect) = call(
-        RegId::Static(tea_sdk::actors::tokenstate::NAME).inst(0),
+    let QueryUserLoginSessionKeyResponse(expect) = ActorId::Static(tea_sdk::actors::tokenstate::NAME).call(
         QueryUserLoginSessionKeyRequest {
             token_id: my_token_id().await?,
             account,

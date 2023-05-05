@@ -1,6 +1,6 @@
 use tea_sdk::utils::client_wasm_actor::{Result};
 use tea_sdk::actors::http::{OracleHttpRequest};
-use tea_sdk::actorx::runtime::{RegId, call};
+use tea_sdk::actorx::ActorId;
 use tea_sdk::actors::tappstore_client;
 
 const TWITTER_OAUTH_KEY: &str = "AAAAAAAAAAAAAAAAAAAAAF4gTwEAAAAAedgLBTRn%2Bp78NXs2n12t7xhbcl8%3DRE8ZxY6KcGFaUKYa1F5oWgf6pE0rBC8Us8A3hiIdEUwx4rUF8f";
@@ -23,8 +23,7 @@ pub async fn twitter_request(twitter_id: &str, target_str: &str) -> Result<bool>
     payload: None
   };
 
-  let rs = call(
-    RegId::Static(tappstore_client::NAME).inst(0),
+  let rs = ActorId::Static(tappstore_client::NAME).call(
     req,
   ).await?;
   let json: serde_json::Value = serde_json::from_str(&rs.text)?;
