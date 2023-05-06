@@ -14,5 +14,5 @@ serde_json = { workspace = true }
 log = { workspace = true }
 
 [dev-dependencies]
-# tea-sdk = { workspace = true}
+tea-sdk = { workspace = true, features = ["host"]}
 tokio = { workspace = true, features = ["full"] }

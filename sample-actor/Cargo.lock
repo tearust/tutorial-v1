@@ -381,6 +381,17 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "acbf1af155f9b9ef647e42cdc158db4b64a1b61f743629225fde6f3e0be2a7c7"
 
 [[package]]
+name = "command-fds"
+version = "0.2.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "35cc819120a403d0eb3d0c404088c5a9f9b06066147ec69a21919fbc0833ef68"
+dependencies = [
+ "nix",
+ "thiserror",
+ "tokio",
+]
+
+[[package]]
 name = "convert_case"
 version = "0.5.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -445,7 +456,7 @@ dependencies = [
  "autocfg",
  "cfg-if",
  "crossbeam-utils",
- "memoffset",
+ "memoffset 0.8.0",
  "scopeguard",
 ]
 
@@ -1123,9 +1134,9 @@ dependencies = [
 
 [[package]]
 name = "linux-raw-sys"
-version = "0.3.6"
+version = "0.3.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b64f40e5e03e0d54f03845c8197d0291253cdbedfb1cb46b13c2c117554a9f4c"
+checksum = "ece97ea872ece730aed82664c424eb4c8291e1ff2480247ccf7409044bc6479f"
 
 [[package]]
 name = "lock_api"
@@ -1164,6 +1175,15 @@ checksum = "2dffe52ecf27772e601905b7522cb4ef790d2cc203488bbd0e2fe85fcb74566d"
 
 [[package]]
 name = "memoffset"
+version = "0.6.5"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "5aa361d4faea93603064a027415f07bd8e1d5c88c9fbf68bf56a285428fd79ce"
+dependencies = [
+ "autocfg",
+]
+
+[[package]]
+name = "memoffset"
 version = "0.8.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "d61c719bcfbcf5d62b3a09efa6088de8c54bc0bfcd3ea7ae39fcc186108b8de1"
@@ -1188,6 +1208,19 @@ name = "multimap"
 version = "0.8.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "e5ce46fe64a9d73be07dcbe690a38ce1b293be448fd8ce1e6c1b8062c9f72c6a"
+
+[[package]]
+name = "nix"
+version = "0.22.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "e4916f159ed8e5de0082076562152a76b7a1f64a01fd9d1e0fea002c37624faf"
+dependencies = [
+ "bitflags",
+ "cc",
+ "cfg-if",
+ "libc",
+ "memoffset 0.6.5",
+]
 
 [[package]]
 name = "nu-ansi-term"
@@ -1291,9 +1324,9 @@ checksum = "b15813163c1d831bf4a13c3610c05c0d03b39feb07f7e09fa234dac9b15aaf39"
 
 [[package]]
 name = "parity-scale-codec"
-version = "3.4.0"
+version = "3.5.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "637935964ff85a605d114591d4d2c13c5d1ba2806dae97cea6bf180238a749ac"
+checksum = "5ddb756ca205bd108aee3c62c6d3c994e1df84a59b9d6d4a5ea42ee1fd5a9a28"
 dependencies = [
  "arrayvec",
  "bitvec",
@@ -1726,9 +1759,9 @@ checksum = "3e75f6a532d0fd9f7f13144f392b6ad56a32696bfcd9c78f797f16bbb6f072d6"
 
 [[package]]
 name = "rustix"
-version = "0.37.18"
+version = "0.37.19"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "8bbfc1d1c7c40c01715f47d71444744a81669ca84e8b63e25a55e169b1f86433"
+checksum = "acf8729d8542766f1b2cf77eb034d52f40d375bb8b615d0b147089946e16613d"
 dependencies = [
  "bitflags",
  "errno",
@@ -1790,9 +1823,9 @@ checksum = "1c107b6f4780854c8b126e228ea8869f4d7b71260f962fefb57b996b8959ba6b"
 
 [[package]]
 name = "serde"
-version = "1.0.160"
+version = "1.0.162"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "bb2f3770c8bce3bcda7e149193a069a0f4365bda1fa5cd88e03bca26afc1216c"
+checksum = "71b2f6e1ab5c2b98c05f0f35b236b22e8df7ead6ffbf51d7808da7f8817e7ab6"
 dependencies = [
  "serde_derive",
 ]
@@ -1808,9 +1841,9 @@ dependencies = [
 
 [[package]]
 name = "serde_derive"
-version = "1.0.160"
+version = "1.0.162"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "291a097c63d8497e00160b166a967a4a79c64f3facdd01cbd7502231688d77df"
+checksum = "a2a0814352fd64b58489904a44ea8d90cb1a91dcb6b4f5ebabc32c8318e93cb6"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -2014,23 +2047,26 @@ checksum = "55937e1799185b12863d447f42597ed69d9928686b8d88a1df17376a097d8369"
 
 [[package]]
 name = "tea-actorx"
-version = "0.3.0-dev.2"
-source = "git+https://github.com/tearust/sdk?branch=master#45893d899baff26f2c0dc0a1bfd5a94bd924d332"
+version = "0.3.0-dev.4"
+source = "git+https://github.com/tearust/sdk?branch=master#a1df8f43ae2c306f0b01085343b084eac60dc4dc"
 dependencies = [
  "bincode",
+ "command-fds",
  "futures",
  "primitive-types",
  "serde",
  "strum",
  "tea-codec",
  "thiserror",
+ "tokio",
+ "tokio-util",
  "tracing",
 ]
 
 [[package]]
 name = "tea-codec"
-version = "0.3.0-dev.2"
-source = "git+https://github.com/tearust/sdk?branch=master#45893d899baff26f2c0dc0a1bfd5a94bd924d332"
+version = "0.3.0-dev.4"
+source = "git+https://github.com/tearust/sdk?branch=master#a1df8f43ae2c306f0b01085343b084eac60dc4dc"
 dependencies = [
  "base64",
  "bincode",
@@ -2039,6 +2075,7 @@ dependencies = [
  "futures",
  "hex",
  "impl-trait-for-tuples",
+ "lazy_static",
  "log",
  "num-derive",
  "num-traits",
@@ -2050,13 +2087,14 @@ dependencies = [
  "smallvec",
  "tea-codec-macros",
  "thiserror",
+ "tokio",
  "tracing",
 ]
 
 [[package]]
 name = "tea-codec-macros"
-version = "0.3.0-dev.2"
-source = "git+https://github.com/tearust/sdk?branch=master#45893d899baff26f2c0dc0a1bfd5a94bd924d332"
+version = "0.3.0-dev.4"
+source = "git+https://github.com/tearust/sdk?branch=master#a1df8f43ae2c306f0b01085343b084eac60dc4dc"
 dependencies = [
  "convert_case",
  "itertools",
@@ -2067,8 +2105,8 @@ dependencies = [
 
 [[package]]
 name = "tea-runtime-codec"
-version = "0.3.0-dev.2"
-source = "git+https://github.com/tearust/sdk?branch=master#45893d899baff26f2c0dc0a1bfd5a94bd924d332"
+version = "0.3.0-dev.4"
+source = "git+https://github.com/tearust/sdk?branch=master#a1df8f43ae2c306f0b01085343b084eac60dc4dc"
 dependencies = [
  "base64",
  "bincode",
@@ -2098,8 +2136,8 @@ dependencies = [
 
 [[package]]
 name = "tea-sdk"
-version = "0.3.0-dev.2"
-source = "git+https://github.com/tearust/sdk?branch=master#45893d899baff26f2c0dc0a1bfd5a94bd924d332"
+version = "0.3.0-dev.4"
+source = "git+https://github.com/tearust/sdk?branch=master#a1df8f43ae2c306f0b01085343b084eac60dc4dc"
 dependencies = [
  "tea-actorx",
  "tea-codec",
@@ -2110,8 +2148,8 @@ dependencies = [
 
 [[package]]
 name = "tea-system-actors"
-version = "0.3.0-dev.2"
-source = "git+https://github.com/tearust/sdk?branch=master#45893d899baff26f2c0dc0a1bfd5a94bd924d332"
+version = "0.3.0-dev.4"
+source = "git+https://github.com/tearust/sdk?branch=master#a1df8f43ae2c306f0b01085343b084eac60dc4dc"
 dependencies = [
  "serde",
  "strum",
@@ -2122,8 +2160,8 @@ dependencies = [
 
 [[package]]
 name = "tea-wasm-actor-utils"
-version = "0.3.0-dev.2"
-source = "git+https://github.com/tearust/sdk?branch=master#45893d899baff26f2c0dc0a1bfd5a94bd924d332"
+version = "0.3.0-dev.4"
+source = "git+https://github.com/tearust/sdk?branch=master#a1df8f43ae2c306f0b01085343b084eac60dc4dc"
 dependencies = [
  "base64",
  "bytes",
@@ -2248,6 +2286,19 @@ dependencies = [
  "proc-macro2",
  "quote",
  "syn 2.0.15",
+]
+
+[[package]]
+name = "tokio-util"
+version = "0.7.8"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "806fe8c2c87eccc8b3267cbae29ed3ab2d0bd37fca70ab622e46aaa9375ddb7d"
+dependencies = [
+ "bytes",
+ "futures-core",
+ "futures-sink",
+ "pin-project-lite",
+ "tokio",
 ]
 
 [[package]]
