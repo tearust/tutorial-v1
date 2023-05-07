@@ -51,7 +51,7 @@ module.exports = {
     }
   },
   devServer: {
-    port : 3200,
+    port : 3202,
     https : false,
     disableHostCheck: true,
   }
