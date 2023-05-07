@@ -17,7 +17,7 @@ use tea_sdk::{
     serialize,
     utils::wasm_actor::actors::statemachine::{query_state_tsid, CommitContext, CommitContextList},
     vmh::message::{encode_protobuf, structs_proto::tokenstate},
-    OptionExt, tapp::GOD_MODE_AUTH_KEY,
+    OptionExt,
 };
 
 pub(crate) async fn txn_exec(tsid: Tsid, txn: &Txns) -> Result<()> {
@@ -26,16 +26,10 @@ pub(crate) async fn txn_exec(tsid: Tsid, txn: &Txns) -> Result<()> {
     let base: Tsid = query_state_tsid().await?;
     let ctx = serialize(&TokenContext::new_slim(tsid, base, my_token_id()))?;
     let commit_ctx = match txn {
+
         Txns::Init {} => {
             sql_init(tsid).await?;
-            CommitContext::new(
-                ctx,
-                None,
-                None,
-                None,
-                GOD_MODE_AUTH_KEY,
-                txn.to_string(),
-            )
+            CommitContext::ctx_receipting(ctx, txn.to_string())
         }
         Txns::CreateTask { task, auth_b64 } => {
             check_account(auth_b64, task.creator).await?;

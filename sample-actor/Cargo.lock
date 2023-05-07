@@ -1108,9 +1108,9 @@ checksum = "e2abad23fbc42b3700f2f279844dc832adb2b2eb069b2df918f455c4e18cc646"
 
 [[package]]
 name = "libc"
-version = "0.2.142"
+version = "0.2.143"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "6a987beff54b60ffa6d51982e1aa1146bc42f19bd26be28b0586f252fccf5317"
+checksum = "edc207893e85c5d6be840e969b496b53d94cec8be2d501b214f50daa97fa8024"
 
 [[package]]
 name = "link-cplusplus"
@@ -1291,9 +1291,9 @@ checksum = "b15813163c1d831bf4a13c3610c05c0d03b39feb07f7e09fa234dac9b15aaf39"
 
 [[package]]
 name = "parity-scale-codec"
-version = "3.4.0"
+version = "3.5.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "637935964ff85a605d114591d4d2c13c5d1ba2806dae97cea6bf180238a749ac"
+checksum = "5ddb756ca205bd108aee3c62c6d3c994e1df84a59b9d6d4a5ea42ee1fd5a9a28"
 dependencies = [
  "arrayvec",
  "bitvec",
@@ -1805,9 +1805,9 @@ checksum = "1c107b6f4780854c8b126e228ea8869f4d7b71260f962fefb57b996b8959ba6b"
 
 [[package]]
 name = "serde"
-version = "1.0.160"
+version = "1.0.162"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "bb2f3770c8bce3bcda7e149193a069a0f4365bda1fa5cd88e03bca26afc1216c"
+checksum = "71b2f6e1ab5c2b98c05f0f35b236b22e8df7ead6ffbf51d7808da7f8817e7ab6"
 dependencies = [
  "serde_derive",
 ]
@@ -1823,9 +1823,9 @@ dependencies = [
 
 [[package]]
 name = "serde_derive"
-version = "1.0.160"
+version = "1.0.162"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "291a097c63d8497e00160b166a967a4a79c64f3facdd01cbd7502231688d77df"
+checksum = "a2a0814352fd64b58489904a44ea8d90cb1a91dcb6b4f5ebabc32c8318e93cb6"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -2029,8 +2029,8 @@ checksum = "55937e1799185b12863d447f42597ed69d9928686b8d88a1df17376a097d8369"
 
 [[package]]
 name = "tea-actorx"
-version = "0.3.0-dev.2"
-source = "git+https://github.com/tearust/sdk?branch=master#45893d899baff26f2c0dc0a1bfd5a94bd924d332"
+version = "0.3.0-dev.5"
+source = "git+https://github.com/tearust/sdk?branch=master#869ec9309bdcd3dd1bf2010e826ec56a0f65970b"
 dependencies = [
  "bincode",
  "futures",
@@ -2044,8 +2044,8 @@ dependencies = [
 
 [[package]]
 name = "tea-codec"
-version = "0.3.0-dev.2"
-source = "git+https://github.com/tearust/sdk?branch=master#45893d899baff26f2c0dc0a1bfd5a94bd924d332"
+version = "0.3.0-dev.5"
+source = "git+https://github.com/tearust/sdk?branch=master#869ec9309bdcd3dd1bf2010e826ec56a0f65970b"
 dependencies = [
  "base64",
  "bincode",
@@ -2070,8 +2070,8 @@ dependencies = [
 
 [[package]]
 name = "tea-codec-macros"
-version = "0.3.0-dev.2"
-source = "git+https://github.com/tearust/sdk?branch=master#45893d899baff26f2c0dc0a1bfd5a94bd924d332"
+version = "0.3.0-dev.5"
+source = "git+https://github.com/tearust/sdk?branch=master#869ec9309bdcd3dd1bf2010e826ec56a0f65970b"
 dependencies = [
  "convert_case",
  "itertools",
@@ -2082,8 +2082,8 @@ dependencies = [
 
 [[package]]
 name = "tea-runtime-codec"
-version = "0.3.0-dev.2"
-source = "git+https://github.com/tearust/sdk?branch=master#45893d899baff26f2c0dc0a1bfd5a94bd924d332"
+version = "0.3.0-dev.5"
+source = "git+https://github.com/tearust/sdk?branch=master#869ec9309bdcd3dd1bf2010e826ec56a0f65970b"
 dependencies = [
  "base64",
  "bincode",
@@ -2113,8 +2113,8 @@ dependencies = [
 
 [[package]]
 name = "tea-sdk"
-version = "0.3.0-dev.2"
-source = "git+https://github.com/tearust/sdk?branch=master#45893d899baff26f2c0dc0a1bfd5a94bd924d332"
+version = "0.3.0-dev.5"
+source = "git+https://github.com/tearust/sdk?branch=master#869ec9309bdcd3dd1bf2010e826ec56a0f65970b"
 dependencies = [
  "tea-actorx",
  "tea-codec",
@@ -2125,8 +2125,8 @@ dependencies = [
 
 [[package]]
 name = "tea-system-actors"
-version = "0.3.0-dev.2"
-source = "git+https://github.com/tearust/sdk?branch=master#45893d899baff26f2c0dc0a1bfd5a94bd924d332"
+version = "0.3.0-dev.5"
+source = "git+https://github.com/tearust/sdk?branch=master#869ec9309bdcd3dd1bf2010e826ec56a0f65970b"
 dependencies = [
  "serde",
  "strum",
@@ -2137,8 +2137,8 @@ dependencies = [
 
 [[package]]
 name = "tea-wasm-actor-utils"
-version = "0.3.0-dev.2"
-source = "git+https://github.com/tearust/sdk?branch=master#45893d899baff26f2c0dc0a1bfd5a94bd924d332"
+version = "0.3.0-dev.5"
+source = "git+https://github.com/tearust/sdk?branch=master#869ec9309bdcd3dd1bf2010e826ec56a0f65970b"
 dependencies = [
  "base64",
  "bytes",
