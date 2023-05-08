@@ -2024,8 +2024,8 @@ checksum = "55937e1799185b12863d447f42597ed69d9928686b8d88a1df17376a097d8369"
 
 [[package]]
 name = "tea-actorx"
-version = "0.3.0-dev.5"
-source = "git+https://github.com/tearust/sdk?branch=master#869ec9309bdcd3dd1bf2010e826ec56a0f65970b"
+version = "0.3.0-dev.6"
+source = "git+https://github.com/tearust/sdk?branch=master#77e27e0f16ef5ebbd50dad2546b290109d4093ef"
 dependencies = [
  "bincode",
  "futures",
@@ -2039,8 +2039,8 @@ dependencies = [
 
 [[package]]
 name = "tea-codec"
-version = "0.3.0-dev.5"
-source = "git+https://github.com/tearust/sdk?branch=master#869ec9309bdcd3dd1bf2010e826ec56a0f65970b"
+version = "0.3.0-dev.6"
+source = "git+https://github.com/tearust/sdk?branch=master#77e27e0f16ef5ebbd50dad2546b290109d4093ef"
 dependencies = [
  "base64 0.13.1",
  "bincode",
@@ -2065,8 +2065,8 @@ dependencies = [
 
 [[package]]
 name = "tea-codec-macros"
-version = "0.3.0-dev.5"
-source = "git+https://github.com/tearust/sdk?branch=master#869ec9309bdcd3dd1bf2010e826ec56a0f65970b"
+version = "0.3.0-dev.6"
+source = "git+https://github.com/tearust/sdk?branch=master#77e27e0f16ef5ebbd50dad2546b290109d4093ef"
 dependencies = [
  "convert_case",
  "itertools",
@@ -2077,8 +2077,8 @@ dependencies = [
 
 [[package]]
 name = "tea-runtime-codec"
-version = "0.3.0-dev.5"
-source = "git+https://github.com/tearust/sdk?branch=master#869ec9309bdcd3dd1bf2010e826ec56a0f65970b"
+version = "0.3.0-dev.6"
+source = "git+https://github.com/tearust/sdk?branch=master#77e27e0f16ef5ebbd50dad2546b290109d4093ef"
 dependencies = [
  "base64 0.13.1",
  "bincode",
@@ -2108,8 +2108,8 @@ dependencies = [
 
 [[package]]
 name = "tea-sdk"
-version = "0.3.0-dev.5"
-source = "git+https://github.com/tearust/sdk?branch=master#869ec9309bdcd3dd1bf2010e826ec56a0f65970b"
+version = "0.3.0-dev.6"
+source = "git+https://github.com/tearust/sdk?branch=master#77e27e0f16ef5ebbd50dad2546b290109d4093ef"
 dependencies = [
  "tea-actorx",
  "tea-codec",
@@ -2120,8 +2120,8 @@ dependencies = [
 
 [[package]]
 name = "tea-system-actors"
-version = "0.3.0-dev.5"
-source = "git+https://github.com/tearust/sdk?branch=master#869ec9309bdcd3dd1bf2010e826ec56a0f65970b"
+version = "0.3.0-dev.6"
+source = "git+https://github.com/tearust/sdk?branch=master#77e27e0f16ef5ebbd50dad2546b290109d4093ef"
 dependencies = [
  "serde",
  "strum",
@@ -2132,8 +2132,8 @@ dependencies = [
 
 [[package]]
 name = "tea-wasm-actor-utils"
-version = "0.3.0-dev.5"
-source = "git+https://github.com/tearust/sdk?branch=master#869ec9309bdcd3dd1bf2010e826ec56a0f65970b"
+version = "0.3.0-dev.6"
+source = "git+https://github.com/tearust/sdk?branch=master#77e27e0f16ef5ebbd50dad2546b290109d4093ef"
 dependencies = [
  "base64 0.13.1",
  "bytes",
