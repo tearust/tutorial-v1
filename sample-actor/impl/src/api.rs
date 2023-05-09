@@ -230,7 +230,7 @@ pub async fn complete_task_cb(payload: Vec<u8>, from_actor: String) -> Result<Ve
 	let req: CompleteTaskRequest = tea_sdk::deserialize(&payload)?;
 	info!("Complete Task callback action...");
 
-	let pass = oracle::twitter_request(&req.subject, &req.text).await;
+	let pass = oracle::twitter_request(&req.text, &req.subject).await;
 	let pass = if pass.is_err() {
 		false
 	} else {
