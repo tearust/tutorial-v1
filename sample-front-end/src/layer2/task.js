@@ -9,6 +9,7 @@ import eth from '../eth';
 import common from './common';
 import user from './user';
 
+const reg_tweet = /^https:\/\/twitter.com\/(.+)\/status\/(\d+)/i;
 
 const F = {
   async initDB(self, succ_cb){
@@ -55,7 +56,8 @@ const F = {
           subject: {
             type: 'Input',
             required: true,
-            label: 'Twitter ID',
+            label: 'Tweet URL',
+            tip: "The tweet url you want retweeted."
           },
           price: {
             type: 'number',
@@ -75,18 +77,22 @@ const F = {
         const price = utils.layer1.amountToBalance(form.price);
         const required_deposit = utils.layer1.amountToBalance(form.required_deposit);
 
+        let tweet = form.subject;
+        if(reg_tweet.test(tweet)){
+          const arr = tweet.match(reg_tweet);
+          tweet = arr[2];
+        }
         const param = {
           address: self.layer1_account.address,
           tappIdB64: tappId,
           authB64: session_key,
           price: utils.toBN(price).toString(),
           requiredDeposit: utils.toBN(required_deposit).toString(),
-          subject: form.subject,
+          subject: tweet,
         };
 
         try {
           await txn.txn_request('create_task', param);
-          self.$root.success();
           await succ_cb();
         } catch (e) {
           console.error(e);
@@ -118,7 +124,6 @@ const F = {
 
     try {
       await txn.txn_request('delete_task', opts);
-      self.$root.success();
       await succ_cb();
     } catch (e) {
       console.error(e);
@@ -146,7 +151,6 @@ const F = {
 
     try {
       await txn.txn_request('take_task', opts);
-      self.$root.success();
       await succ_cb();
     } catch (e) {
       console.error(e);
@@ -161,12 +165,13 @@ const F = {
       key: 'common_form',
       param: {
         title: 'Complete Task',
-        text: `Please input your answer and complete the task.`,
+        text: `Quote retweet the following tweet and enter your quote retweet url below to complete the task.<br/>
+        Please quote retweet <a target="_blank" href="https://twitter.com/u/status/${param.subject}">https://twitter.com/u/status/${param.subject}<a/>`,
         props: {
           text: {
             type: 'Input',
             required: true,
-            label: 'Answer',
+            label: 'Quote Retweet URL',
           },
 
         },
@@ -174,17 +179,22 @@ const F = {
       cb: async (form, close) => {
         self.$root.loading(true);
 
+        let tweet = form.text;
+        if(reg_tweet.test(tweet)){
+          const arr = tweet.match(reg_tweet);
+          tweet = arr[2];
+        }
+
         const opts = {
           address: self.layer1_account.address,
           tappIdB64: base.getTappId(),
           authB64: session_key,
           subject: param.subject,
-          text: form.text,
+          text: tweet
         };
 
         try {
           await txn.txn_request('complete_task', opts);
-          self.$root.success();
           await succ_cb();
         } catch (e) {
           console.error(e);

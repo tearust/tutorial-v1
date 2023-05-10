@@ -1,6 +1,6 @@
 <template>
 <div class="tea-page">
-  <h4>Task list</h4>
+  <h4>Retweet task list</h4>
 
   <el-button size="small" class="tea-refresh-btn" type="primary" plain icon="el-icon-refresh" circle @click="refreshList()"></el-button>
   <TeaTable
@@ -9,7 +9,7 @@
   >
     <el-table-column
       prop="subject"
-      label="Subject"
+      label="Tweet Id"
     />
 
     <el-table-column
@@ -52,10 +52,8 @@
         
 
         <TeaIconButton v-if="!$root.eq(scope.row.creator, user.address) && scope.row.status==='New'" tip="Take task" icon="NA" title="Take" @click="takeTask(scope.row)" />
-        <TeaIconButton v-if="$root.eq(scope.row.worker, user.address) && scope.row.status==='InProgress'" tip="Take task" icon="NA" title="Complete" @click="completeTask(scope.row)" />
+        <TeaIconButton v-if="$root.eq(scope.row.worker, user.address) && scope.row.status==='InProgress'" tip="Complete task" icon="NA" title="Complete" @click="completeTask(scope.row)" />
 
-        <!-- <TeaIconButton v-if="$root.eq(scope.row.creator, user.address) && scope.row.status==='WaitForVerification'" tip="Verify success" icon="NA" title="Confirm" @click="verifyTask(scope.row, true)" />
-        <TeaIconButton v-if="$root.eq(scope.row.creator, user.address) && scope.row.status==='WaitForVerification'" tip="Verify failed" icon="NA" title="Reject" @click="verifyTask(scope.row, false)" /> -->
 
 
         <TeaIconButton v-if="$root.eq(scope.row.creator, user.address) && (scope.row.status==='New' || scope.row.status==='Done')" tip="Remove task" icon="NA" title="Remove" @click="deleteTask(scope.row)" />
@@ -139,7 +137,7 @@ export default {
     async completeTask(row){
       try{
         await layer2.task.completeTask(this, row, async (rs)=>{
-          this.$root.success("Complete task success");
+          this.$root.success("The task bounty has been deposited into your wallet.");
           await utils.sleep(8000);
           await this.refreshList();
         });
