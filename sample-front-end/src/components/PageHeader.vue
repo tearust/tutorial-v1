@@ -39,7 +39,7 @@
     <el-button style="margin-left: 10px; font-size: 17px;" @click="loginOrLogout()" type="text">{{user ? 'Logout' : 'Login'}}</el-button>
   </div>
 
-  <el-menu-item index="/log">{{'Log'}}</el-menu-item>
+  <el-menu-item v-if="$root.is_dev()" index="/log">{{'Log'}}</el-menu-item>
   <el-menu-item index="/account_profile">{{'Account'}}</el-menu-item>
   <el-menu-item v-if="$root.is_dev()" index="/admin">{{'Admin'}}</el-menu-item>
   <el-menu-item index="/task_main">{{'Task'}}</el-menu-item>
