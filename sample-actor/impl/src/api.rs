@@ -239,7 +239,7 @@ pub async fn complete_task_cb(payload: Vec<u8>, from_actor: String) -> Result<Ve
 
 	let txn = Txns::VerifyTask {
     subject: req.subject.to_string(),
-		failed: !pass,
+		failed: !pass.clone(),
 		auth_b64: req.auth_b64.to_string(),
 	};
 	info!("Begin to send verify txn => {:?}", txn);
@@ -254,7 +254,12 @@ pub async fn complete_task_cb(payload: Vec<u8>, from_actor: String) -> Result<Ve
 	)
 	.await?;
 
-	help::result_ok()
+	if pass {
+		help::result_ok()
+	} else {
+		help::result_error("Non-valid retweet. Please check that you've quote retweeted the source tweet and try the task again.".to_string())
+	}
+
 }
 
 pub async fn init_db(payload: Vec<u8>, from_actor: String) -> Result<Vec<u8>> {

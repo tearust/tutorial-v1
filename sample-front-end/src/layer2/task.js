@@ -158,7 +158,7 @@ const F = {
     }
     self.$root.loading(false);
   },
-  async completeTask(self, param, succ_cb){
+  async completeTask(self, param, succ_cb, error_cb){
     const session_key = user.checkLogin(self);
 
     self.$store.commit('modal/open', {
@@ -166,7 +166,7 @@ const F = {
       param: {
         title: 'Complete Task',
         text: `Quote retweet the following tweet and enter your quote retweet url below to complete the task.<br/>
-        Please quote retweet <a target="_blank" href="https://twitter.com/u/status/${param.subject}">https://twitter.com/u/status/${param.subject}<a/>`,
+        Please quote retweet <a target="_blank" href="https://twitter.com/u/status/${param.subject}">https://twitter.com/u/status/${param.subject}<a/><br/><img style="width:160px;margin-top:10px; margin-left:150px;" src="/quote.png" />`,
         props: {
           text: {
             type: 'Input',
@@ -199,6 +199,9 @@ const F = {
         } catch (e) {
           console.error(e);
           self.$root.showError(e.toString());
+          if(error_cb){
+            await error_cb();
+          }
         }
         close();
         self.$root.loading(false);

@@ -10,7 +10,12 @@
     <el-table-column
       prop="subject"
       label="Tweet Id"
-    />
+      width="160"
+    >
+      <template slot-scope="scope">
+        <el-link type="primary" style="display:inline;" :href="`https://twitter.com/u/status/${scope.row.subject}`" target="_blank">{{scope.row.subject}}</el-link>
+      </template>
+    </el-table-column>
 
     <el-table-column
       prop="creator"
@@ -135,15 +140,13 @@ export default {
       }
     },
     async completeTask(row){
-      try{
-        await layer2.task.completeTask(this, row, async (rs)=>{
-          this.$root.success("The task bounty has been deposited into your wallet.");
-          await utils.sleep(8000);
-          await this.refreshList();
-        });
-      }catch(e){
-        this.$root.showError(e);
-      }
+      await layer2.task.completeTask(this, row, async (rs)=>{
+        this.$root.success("The task bounty has been deposited into your wallet.");
+        await utils.sleep(2000);
+        await this.refreshList();
+      }, async ()=>{
+        await this.refreshList();
+      });
     },
     async takeTask(row){
       try{
