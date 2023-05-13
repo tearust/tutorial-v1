@@ -19,14 +19,14 @@ use tea_sdk::{
 };
 
 pub(crate) async fn query_all_tasks() -> Result<Vec<Task>> {
-    let payload = sql_query_first(my_token_id(), "SELECT * FROM Tasks;".into()).await?;
+    let payload = sql_query_first(my_token_id().await?, "SELECT * FROM Tasks;".into()).await?;
     let rows = query_select_rows(&payload)?;
     rows.iter().map(|v| parse_task(v)).collect()
 }
 
 pub(crate) async fn task_by_subject(subject: &str) -> Result<Task> {
     let payload = sql_query_first(
-        my_token_id(),
+        my_token_id().await?,
         format!("SELECT * FROM Tasks where subject = '{subject}';"),
     )
     .await?;
@@ -96,7 +96,7 @@ pub(crate) async fn complete_task(tsid: Tsid, subject: &str) -> Result<()> {
 
 pub(crate) async fn sql_init(tsid: Tsid) -> Result<()> {
     let req = tokenstate::InitGlueSqlRequest {
-        token_id: serialize(&my_token_id())?,
+        token_id: serialize(&my_token_id().await?)?,
         tsid: serialize(&tsid)?,
     };
     ActorId::Static(NAME).call(
@@ -110,7 +110,7 @@ pub(crate) async fn sql_init(tsid: Tsid) -> Result<()> {
 
 async fn exec_sql(tsid: Tsid, sql: String) -> Result<()> {
     let req = tokenstate::ExecGlueSqlRequest {
-        token_id: serialize(&my_token_id())?,
+        token_id: serialize(&my_token_id().await?)?,
         sql,
         tsid: serialize(&tsid)?,
     };

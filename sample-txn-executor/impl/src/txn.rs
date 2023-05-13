@@ -24,7 +24,7 @@ pub(crate) async fn txn_exec(tsid: Tsid, txn: &Txns) -> Result<()> {
     info!("begin of process transaction for sample => {txn}");
 
     let base: Tsid = query_state_tsid().await?;
-    let ctx = serialize(&TokenContext::new_slim(tsid, base, my_token_id()))?;
+    let ctx = serialize(&TokenContext::new_slim(tsid, base, my_token_id().await?))?;
     let commit_ctx = match txn {
 
         Txns::Init {} => {
@@ -137,7 +137,7 @@ pub(crate) async fn txn_exec(tsid: Tsid, txn: &Txns) -> Result<()> {
 async fn new_gluedb_context() -> Result<Option<tokenstate::GluedbTransactionContext>> {
     let buf = ActorId::Static(NAME).call(
         SqlBeginTransactionRequest(encode_protobuf(tokenstate::BeginTransactionRequest {
-            token_id: serialize(&my_token_id())?,
+            token_id: serialize(&my_token_id().await?)?,
         })?),
     )
     .await?;

@@ -4,19 +4,23 @@ use tea_sdk::{
     actors::tokenstate::{QueryUserLoginSessionKeyRequest, QueryUserLoginSessionKeyResponse},
     actorx::{ActorId},
     deserialize,
+    utils::wasm_actor::actors::env::get_current_wasm_actor_token_id,
     tapp::{Account, AuthKey, TokenId},
     ResultExt,
 };
 
-pub fn my_token_id() -> TokenId {
-    // token id should equal to `token_id` field defined in manifest.yaml
-    TokenId::default()
+pub async fn my_token_id() -> Result<TokenId> {
+    let token_str = get_current_wasm_actor_token_id().await?;
+    if token_str.is_some() {
+        return Ok(TokenId::from_hex(token_str.unwrap())?);
+    }
+    Ok(TokenId::default())
 }
 
 pub async fn check_account(auth_b64: &str, account: Account) -> Result<()> {
     let QueryUserLoginSessionKeyResponse(expect) = ActorId::Static(tea_sdk::actors::tokenstate::NAME).call(
         QueryUserLoginSessionKeyRequest {
-            token_id: my_token_id(),
+            token_id: my_token_id().await?,
             account,
         },
     )
