@@ -20,12 +20,12 @@ const F = {
         confirm_text: 'Confirm',
         text: ``,
         props: {
-          tapp_id: {
-            label: 'Name',
-            type: 'Input',
-            disabled: true,
-            default: data.name,
-          },
+          // tapp_id: {
+          //   label: 'Token id',
+          //   type: 'Input',
+          //   disabled: true,
+          //   default: data.name,
+          // },
           amount: {
             label: 'Amount',
             type: 'number',
