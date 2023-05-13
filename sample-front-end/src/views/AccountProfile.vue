@@ -195,9 +195,7 @@ export default {
       });
     },
     async setAllowance(){
-      await layer2.tapp.setAllowance(this, {
-        name: 'Sample-actor',
-      }, async ()=>{
+      await layer2.tapp.setAllowance(this, {}, async ()=>{
         await this.refreshAccount();
       });
     }

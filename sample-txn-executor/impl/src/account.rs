@@ -15,7 +15,7 @@ pub(crate) async fn deposit_for_task(
     amount: Balance,
     ctx: Vec<u8>,
 ) -> Result<(Vec<u8>, Vec<u8>)> {
-    let tappstore_ctx = tappstore_ctx(tsid, base, Some(my_token_id())).await?;
+    let tappstore_ctx = tappstore_ctx(tsid, base, Some(my_token_id().await?)).await?;
     api_cross_move(from, PUBLIC_RESERVED_ACCOUNT, amount, tappstore_ctx, ctx)
         .await
         .err_into()
